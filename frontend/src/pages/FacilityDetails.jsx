@@ -147,7 +147,7 @@ export default function FacilityDetails() {
             </a>
           )}
           <Link
-            to="/report"
+            to={`/report?facilityId=${id}`}
             className="flex items-center justify-center gap-2 border-2 border-warning-500/40 text-warning-600 font-semibold px-5 py-3 rounded-xl hover:bg-warning-50 transition-colors text-sm"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

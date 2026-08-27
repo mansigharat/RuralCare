@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import MapView from '../components/MapView'
 import FacilityFilters from '../components/FacilityFilters'
+import VerificationBadge from '../components/VerificationBadge'
 import { getFacilities } from '../services/api'
-import { FACILITY_TYPES, SERVICES } from '../data/mockFacilities'
 
 const DEFAULT_FILTERS = {
   type: 'All',
@@ -19,6 +20,7 @@ export default function HealthcareMap() {
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
   const [showFilters, setShowFilters] = useState(false)
   const [mapCentre, setMapCentre] = useState([18.9167, 73.3167])
+  const [selectedFacility, setSelectedFacility] = useState(null)
 
   useEffect(() => {
     const fetchFacilities = async () => {
@@ -51,6 +53,13 @@ export default function HealthcareMap() {
     )
   }
 
+  const typeColors = {
+    PHC: 'bg-blue-100 text-blue-700',
+    CHC: 'bg-indigo-100 text-indigo-700',
+    Hospital: 'bg-purple-100 text-purple-700',
+    'Sub-Centre': 'bg-cyan-100 text-cyan-700',
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
@@ -74,7 +83,11 @@ export default function HealthcareMap() {
           </button>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 text-sm font-medium text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl hover:bg-slate-50 transition-colors"
+            className={`flex items-center gap-2 text-sm font-medium border px-4 py-2.5 rounded-xl transition-colors ${
+              showFilters
+                ? 'bg-primary-50 text-primary-700 border-primary-300'
+                : 'text-slate-700 border-slate-200 hover:bg-slate-50'
+            }`}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
@@ -103,6 +116,9 @@ export default function HealthcareMap() {
             Your Location
           </div>
         )}
+        <div className="ml-auto text-xs text-slate-400">
+          {loading ? 'Loading...' : `${facilities.length} facilit${facilities.length !== 1 ? 'ies' : 'y'} shown`}
+        </div>
       </div>
 
       <div className="flex gap-5">
@@ -115,11 +131,14 @@ export default function HealthcareMap() {
           </aside>
         )}
 
-        {/* Map */}
-        <div className="flex-1 min-w-0">
+        {/* Map + Selected Panel */}
+        <div className="flex-1 min-w-0 flex flex-col gap-4">
           {loading ? (
-            <div className="h-[600px] bg-slate-100 rounded-xl flex items-center justify-center">
-              <div className="text-slate-400 text-sm">Loading map...</div>
+            <div className="h-[520px] bg-slate-100 rounded-xl flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-3"></div>
+                <p className="text-slate-400 text-sm">Loading map...</p>
+              </div>
             </div>
           ) : (
             <MapView
@@ -127,21 +146,78 @@ export default function HealthcareMap() {
               userLocation={userLocation}
               centre={mapCentre}
               zoom={10}
-              height="600px"
+              height="520px"
+              onFacilitySelect={setSelectedFacility}
             />
           )}
 
-          {/* Facility count */}
-          <div className="mt-3 text-sm text-slate-500 text-right">
-            Showing {facilities.length} facilit{facilities.length !== 1 ? 'ies' : 'y'} on map
-          </div>
+          {/* Selected Facility Detail Panel */}
+          {selectedFacility && (
+            <div className="bg-white rounded-xl border border-primary-200 shadow-card-hover p-5 animate-fadeIn">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${typeColors[selectedFacility.type] || 'bg-slate-100 text-slate-700'}`}>
+                      {selectedFacility.type}
+                    </span>
+                    <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${selectedFacility.workingStatus === 'Open' ? 'bg-success-100 text-success-700' : 'bg-slate-100 text-slate-500'}`}>
+                      {selectedFacility.workingStatus === 'Open' ? '● Open Now' : '● Closed'}
+                    </span>
+                    <VerificationBadge status={selectedFacility.verificationStatus} size="sm" />
+                  </div>
+                  <h3 className="font-semibold text-slate-900 text-base mb-1">{selectedFacility.name}</h3>
+                  <p className="text-xs text-slate-500 mb-3">{selectedFacility.address}</p>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {selectedFacility.services.slice(0, 4).map((s) => (
+                      <span key={s} className="text-xs bg-primary-50 text-primary-700 border border-primary-100 px-2 py-0.5 rounded-full">
+                        {s}
+                      </span>
+                    ))}
+                    {selectedFacility.services.length > 4 && (
+                      <span className="text-xs text-slate-400 px-1">+{selectedFacility.services.length - 4} more</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-4 text-xs text-slate-500">
+                    <span className="font-medium text-primary-600">{selectedFacility.distance} km away</span>
+                    <span>{selectedFacility.doctors.length} doctor{selectedFacility.doctors.length !== 1 ? 's' : ''}</span>
+                    {selectedFacility.bedCount > 0 && <span>{selectedFacility.bedCount} beds</span>}
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 flex-shrink-0">
+                  <Link
+                    to={`/facilities/${selectedFacility.id}`}
+                    className="bg-primary-600 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-center"
+                  >
+                    View Details
+                  </Link>
+                  {selectedFacility.phone && (
+                    <a
+                      href={`tel:${selectedFacility.phone}`}
+                      className="border border-slate-200 text-slate-700 text-xs font-medium px-4 py-2 rounded-lg hover:border-primary-300 hover:text-primary-600 transition-colors text-center"
+                    >
+                      📞 Call
+                    </a>
+                  )}
+                  <button
+                    onClick={() => setSelectedFacility(null)}
+                    className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
+                  >
+                    ✕ Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Quick list below map */}
+      {/* Facility list below map */}
       {facilities.length > 0 && (
         <div className="mt-8">
-          <h2 className="font-semibold text-slate-800 mb-4">Facilities on Map</h2>
+          <h2 className="font-semibold text-slate-800 mb-4">
+            Facilities on Map
+            <span className="ml-2 text-sm font-normal text-slate-400">({facilities.length})</span>
+          </h2>
           <div className="overflow-x-auto">
             <table className="w-full bg-white rounded-xl border border-slate-200 shadow-card text-sm">
               <thead>
@@ -149,28 +225,37 @@ export default function HealthcareMap() {
                   <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Name</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Type</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Distance</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Status</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase hidden sm:table-cell">Status</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase hidden md:table-cell">Verification</th>
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody>
                 {facilities.map((f) => (
-                  <tr key={f.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                  <tr
+                    key={f.id}
+                    className={`border-b border-slate-50 hover:bg-slate-50/70 transition-colors cursor-pointer ${selectedFacility?.id === f.id ? 'bg-primary-50/40' : ''}`}
+                    onClick={() => { setSelectedFacility(f); setMapCentre([f.latitude, f.longitude]) }}
+                  >
                     <td className="px-4 py-3 font-medium text-slate-800">{f.name}</td>
                     <td className="px-4 py-3 text-slate-600">{f.type}</td>
-                    <td className="px-4 py-3 text-slate-600">{f.distance} km</td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-slate-600 font-medium text-primary-600">{f.distance} km</td>
+                    <td className="px-4 py-3 hidden sm:table-cell">
                       <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${f.workingStatus === 'Open' ? 'bg-success-100 text-success-700' : 'bg-slate-100 text-slate-400'}`}>
                         {f.workingStatus}
                       </span>
                     </td>
+                    <td className="px-4 py-3 hidden md:table-cell">
+                      <VerificationBadge status={f.verificationStatus} size="sm" />
+                    </td>
                     <td className="px-4 py-3">
-                      <a
-                        href={`/facilities/${f.id}`}
+                      <Link
+                        to={`/facilities/${f.id}`}
                         className="text-xs font-medium text-primary-600 hover:text-primary-700"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         Details →
-                      </a>
+                      </Link>
                     </td>
                   </tr>
                 ))}

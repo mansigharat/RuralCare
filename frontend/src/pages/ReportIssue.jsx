@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { submitReport } from '../services/api'
 import mockFacilities from '../data/mockFacilities'
 
@@ -12,8 +13,11 @@ const PROBLEM_TYPES = [
 ]
 
 export default function ReportIssue() {
+  const [searchParams] = useSearchParams()
+  const prefilledId = searchParams.get('facilityId') || ''
+
   const [formData, setFormData] = useState({
-    facilityId: '',
+    facilityId: prefilledId,
     facilityName: '',
     problemType: '',
     description: '',
@@ -25,6 +29,12 @@ export default function ReportIssue() {
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
 
+  // Update facilityId if URL param changes
+  useEffect(() => {
+    if (prefilledId) {
+      setFormData((prev) => ({ ...prev, facilityId: prefilledId }))
+    }
+  }, [prefilledId])
   const validate = () => {
     const errs = {}
     if (!formData.problemType) errs.problemType = 'Please select a problem type.'

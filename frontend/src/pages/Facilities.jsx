@@ -74,7 +74,7 @@ export default function Facilities() {
       {/* Mobile filter toggle */}
       <div className="flex items-center justify-between mb-4 lg:hidden">
         <p className="text-sm text-slate-600">
-          {loading ? 'Loading...' : `${facilities.length} facility${facilities.length !== 1 ? 'ies' : 'y'} found`}
+          {loading ? 'Loading...' : `${facilities.length} facilit${facilities.length !== 1 ? 'ies' : 'y'} found`}
         </p>
         <button
           onClick={() => setShowMobileFilters(!showMobileFilters)}
