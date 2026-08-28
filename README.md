@@ -1,111 +1,155 @@
 # RuralCare 🏥
 
-### Rural Healthcare Access Platform
+## Rural Healthcare Access Platform
 
-RuralCare is a web platform designed to help rural citizens find nearby government healthcare facilities and get reliable information about available healthcare services.
+RuralCare is a web-based platform designed to help rural citizens find nearby healthcare facilities and check healthcare service availability before travelling.
 
-The platform connects **citizens, healthcare workers, and government authorities** to improve healthcare accessibility and keep facility information up to date.
+The platform connects **citizens, healthcare workers, and government authorities** to improve healthcare accessibility and keep facility information updated.
 
 ---
 
 ## 🎯 Problem
 
-Rural citizens often face difficulties accessing healthcare because:
+Rural citizens face several challenges when accessing healthcare:
 
-- Healthcare facilities may be far away.
-- Information about facilities can be outdated or incomplete.
-- Citizens may not know which facility provides the service they need.
-- Doctors, medicines, and services may not always be available.
-- Government authorities lack a unified view of healthcare accessibility gaps.
+- Healthcare facilities may be located far away.
+- Facility information can be incomplete or outdated.
+- Citizens may not know which facility provides the required service.
+- Information about doctors, medicines, and services may change frequently.
+- Government authorities may not have a unified view of healthcare accessibility gaps.
+
+### Core Problem
+
+**Citizens may travel long distances without knowing whether the required healthcare service is available.**
 
 ---
 
-## 💡 Solution
+## 💡 Proposed Solution
 
 RuralCare provides a single platform where citizens can:
 
 - Find nearby PHCs, CHCs, and hospitals.
-- Check available healthcare services.
-- View facility information and contact details.
-- See healthcare facilities on an interactive map.
+- Search healthcare facilities based on location and services.
+- Check service availability before visiting.
+- View facilities on an interactive map.
 - Get AI-assisted healthcare navigation.
 - Report incorrect or missing facility information.
 
-Healthcare workers can update facility information, while government authorities can monitor healthcare gaps and reported issues.
+Healthcare workers can update facility information, while government authorities can monitor healthcare accessibility gaps.
 
 ---
 
 ## ✨ Key Features
 
-### 📍 Nearby Healthcare Facilities
-Find nearby government healthcare facilities based on location and distance.
+### 📍 Nearby Facility Finder
+
+Find nearby:
+
+- Primary Health Centres (PHCs)
+- Community Health Centres (CHCs)
+- Hospitals
+
+---
 
 ### 🗺️ Smart Healthcare Map
-View PHCs, CHCs, and hospitals on an interactive map.
+
+View healthcare facilities on an interactive map based on:
+
+- Location
+- Distance
+- Available services
+
+---
 
 ### 🏥 Service Availability
-Check information such as:
 
-- Doctors available
-- Services/departments
+Citizens can check information such as:
+
+- Available doctors
+- Healthcare services
 - Medicines
-- Basic facilities
-- Working status
+- Facility status
+- Contact information
+
+---
 
 ### 🤖 AI Healthcare Assistant
-Provides general healthcare guidance and helps users identify suitable healthcare facilities.
 
-> ⚠️ The AI assistant does not provide medical diagnosis and is not a replacement for a doctor.
+The AI assistant helps citizens:
+
+- Understand their healthcare requirement.
+- Find a suitable healthcare facility.
+- Get general healthcare navigation guidance.
+
+> **Note:** The AI assistant is for navigation and general guidance only. It does not provide medical diagnosis.
+
+---
 
 ### ✅ Facility Verification
-Each facility can display:
 
-- Verified Recently
-- Needs Verification
-- Information Outdated
+Facility information can have a verification status such as:
 
-The platform also shows the last verified date.
+- **Verified Recently**
+- **Needs Verification**
+- **Information Outdated**
+
+The system can also display the **last verified date**.
+
+---
 
 ### 📝 Citizen Reporting
+
 Citizens can report:
 
+- Incorrect facility information
 - Missing facilities
-- Incorrect information
 - Unavailable services
-- Unavailable medicines
+- Incorrect medicine availability
+- Other facility-related issues
+
+---
 
 ### 👨‍⚕️ Healthcare Worker Updates
-Authorized healthcare workers can update facility information when services, doctors, medicines, or facilities change.
+
+Authorized healthcare workers can update facility information when:
+
+- Services change
+- Doctors change
+- Medicines become unavailable
+- Facility information changes
+
+---
 
 ### 🏛️ Government Dashboard
-Government authorities can monitor:
 
-- Facility status
+Government authorities can view:
+
+- Healthcare facility information
 - Citizen reports
 - Frequently unavailable services
 - Healthcare accessibility gaps
 
 ---
 
-## 🔄 How It Works
+## 🔄 How RuralCare Works
 
 ```text
-Citizen has a healthcare need
-            ↓
-     RuralCare Platform
-            ↓
-   Understands the requirement
-            ↓
- Finds suitable nearby facility
-            ↓
- Shows verified information
-            ↓
- Facility recommendation
-            ↓
-       Navigation
-            ↓
-     Citizen feedback
-            ↓
- Healthcare information improves
-            ↓
- Government sees healthcare gaps
+Citizen
+   ↓
+RuralCare Web Application
+   ↓
+Search / Location / Healthcare Requirement
+   ↓
+Find Suitable Healthcare Facility
+   ↓
+Check Verified Information
+   ↓
+Facility Recommendation
+   ↓
+Navigation
+   ↓
+Citizen Feedback / Report
+   ↓
+Healthcare Worker Verification & Updates
+   ↓
+Government Healthcare Gap Insights
