@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="bg-slate-800 text-slate-300 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Brand */}
+
           <div>
             <div className="flex items-center gap-2 mb-3">
               <div className="w-7 h-7 bg-primary-500 rounded-md flex items-center justify-center">
@@ -23,7 +23,6 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Quick Links */}
           <div>
             <h4 className="text-white font-semibold text-sm mb-3">Quick Links</h4>
             <ul className="space-y-2">
@@ -42,7 +41,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Help */}
           <div>
             <h4 className="text-white font-semibold text-sm mb-3">Help & Support</h4>
             <ul className="space-y-2">
@@ -59,7 +57,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Emergency */}
           <div>
             <h4 className="text-white font-semibold text-sm mb-3">Emergency</h4>
             <div className="bg-red-900/30 border border-red-700/40 rounded-lg p-3">

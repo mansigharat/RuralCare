@@ -3,9 +3,7 @@ import { FACILITY_TYPES, SERVICES, VERIFICATION_STATUS } from '../data/mockFacil
 const DISTANCE_OPTIONS = ['2', '5', '10', '20', 'Any']
 const VERIFICATION_OPTIONS = ['All', ...Object.values(VERIFICATION_STATUS)]
 
-/**
- * FacilityFilters — sidebar/top filter panel for the Facilities page.
- */
+
 export default function FacilityFilters({ filters, onChange }) {
   const handleChange = (key, value) => {
     onChange({ ...filters, [key]: value })
@@ -30,7 +28,6 @@ export default function FacilityFilters({ filters, onChange }) {
         </button>
       </div>
 
-      {/* Facility Type */}
       <FilterGroup label="Facility Type">
         <div className="space-y-1.5">
           {['All', ...FACILITY_TYPES].map((t) => (
@@ -49,7 +46,6 @@ export default function FacilityFilters({ filters, onChange }) {
         </div>
       </FilterGroup>
 
-      {/* Service */}
       <FilterGroup label="Service">
         <select
           value={filters.service}
@@ -63,7 +59,6 @@ export default function FacilityFilters({ filters, onChange }) {
         </select>
       </FilterGroup>
 
-      {/* Distance */}
       <FilterGroup label="Distance">
         <div className="space-y-1.5">
           {DISTANCE_OPTIONS.map((d) => (
@@ -84,7 +79,6 @@ export default function FacilityFilters({ filters, onChange }) {
         </div>
       </FilterGroup>
 
-      {/* Availability */}
       <FilterGroup label="Availability">
         <div className="space-y-1.5">
           {[
@@ -106,7 +100,6 @@ export default function FacilityFilters({ filters, onChange }) {
         </div>
       </FilterGroup>
 
-      {/* Verification Status */}
       <FilterGroup label="Verification Status">
         <select
           value={filters.verification}

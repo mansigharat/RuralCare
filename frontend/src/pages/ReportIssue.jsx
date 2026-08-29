@@ -29,7 +29,6 @@ export default function ReportIssue() {
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
 
-  // Update facilityId if URL param changes
   useEffect(() => {
     if (prefilledId) {
       setFormData((prev) => ({ ...prev, facilityId: prefilledId }))
@@ -90,7 +89,6 @@ export default function ReportIssue() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
-      {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">Report Incorrect Information</h1>
         <p className="text-slate-500 text-sm mt-1">
@@ -98,7 +96,6 @@ export default function ReportIssue() {
         </p>
       </div>
 
-      {/* Info box */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex gap-3">
         <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -110,7 +107,6 @@ export default function ReportIssue() {
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-slate-200 shadow-card p-6 space-y-5">
 
-        {/* Facility */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1.5">
             Facility (optional)
@@ -140,7 +136,6 @@ export default function ReportIssue() {
           )}
         </div>
 
-        {/* Problem type */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1.5">
             Problem Type <span className="text-red-500">*</span>
@@ -163,7 +158,6 @@ export default function ReportIssue() {
           {errors.problemType && <p className="text-xs text-red-500 mt-1">{errors.problemType}</p>}
         </div>
 
-        {/* Description */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1.5">
             Description <span className="text-red-500">*</span>
@@ -185,7 +179,6 @@ export default function ReportIssue() {
           </div>
         </div>
 
-        {/* Optional location */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1.5">
             Your Location (optional)
@@ -200,7 +193,6 @@ export default function ReportIssue() {
           />
         </div>
 
-        {/* Contact (optional) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Your Name (optional)</label>
@@ -230,7 +222,6 @@ export default function ReportIssue() {
           <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700">{errors.form}</div>
         )}
 
-        {/* Submit */}
         <button
           type="submit"
           disabled={loading}

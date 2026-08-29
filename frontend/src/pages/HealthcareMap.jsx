@@ -62,7 +62,7 @@ export default function HealthcareMap() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Healthcare Map</h1>
@@ -83,11 +83,10 @@ export default function HealthcareMap() {
           </button>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 text-sm font-medium border px-4 py-2.5 rounded-xl transition-colors ${
-              showFilters
+            className={`flex items-center gap-2 text-sm font-medium border px-4 py-2.5 rounded-xl transition-colors ${showFilters
                 ? 'bg-primary-50 text-primary-700 border-primary-300'
                 : 'text-slate-700 border-slate-200 hover:bg-slate-50'
-            }`}
+              }`}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
@@ -97,7 +96,6 @@ export default function HealthcareMap() {
         </div>
       </div>
 
-      {/* Legend */}
       <div className="flex flex-wrap gap-3 mb-4">
         {[
           { type: 'PHC', color: '#2563eb' },
@@ -122,7 +120,7 @@ export default function HealthcareMap() {
       </div>
 
       <div className="flex gap-5">
-        {/* Filters Sidebar */}
+
         {showFilters && (
           <aside className="w-64 flex-shrink-0">
             <div className="sticky top-24">
@@ -131,7 +129,7 @@ export default function HealthcareMap() {
           </aside>
         )}
 
-        {/* Map + Selected Panel */}
+
         <div className="flex-1 min-w-0 flex flex-col gap-4">
           {loading ? (
             <div className="h-[520px] bg-slate-100 rounded-xl flex items-center justify-center">
@@ -151,7 +149,7 @@ export default function HealthcareMap() {
             />
           )}
 
-          {/* Selected Facility Detail Panel */}
+
           {selectedFacility && (
             <div className="bg-white rounded-xl border border-primary-200 shadow-card-hover p-5 animate-fadeIn">
               <div className="flex items-start justify-between gap-3">
@@ -211,7 +209,6 @@ export default function HealthcareMap() {
         </div>
       </div>
 
-      {/* Facility list below map */}
       {facilities.length > 0 && (
         <div className="mt-8">
           <h2 className="font-semibold text-slate-800 mb-4">

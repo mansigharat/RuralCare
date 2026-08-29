@@ -1,6 +1,3 @@
-/**
- * FeatureCard — small card for the Home page feature highlights.
- */
 export default function FeatureCard({ icon, title, description, onClick }) {
   return (
     <button

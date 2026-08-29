@@ -1,7 +1,6 @@
 import { useState } from 'react'
 
 /**
- * SearchBar — reusable search input component.
  * @param {{ onSearch: (query: string) => void, placeholder?: string, className?: string }} props
  */
 export default function SearchBar({ onSearch, placeholder = 'Search...', className = '', initialValue = '' }) {
@@ -14,7 +13,7 @@ export default function SearchBar({ onSearch, placeholder = 'Search...', classNa
 
   const handleChange = (e) => {
     setQuery(e.target.value)
-    // Live search as user types
+ 
     onSearch(e.target.value.trim())
   }
 

@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Base ── */
 @layer base {
   *, *::before, *::after {
     box-sizing: border-box;
@@ -32,7 +31,6 @@
   }
 }
 
-/* ── Leaflet Map Override ── */
 .leaflet-container {
   height: 100%;
   width: 100%;
@@ -50,7 +48,6 @@
   margin: 12px 16px !important;
 }
 
-/* ── Custom scrollbar ── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -66,12 +63,10 @@
   background: #94a3b8;
 }
 
-/* ── Focus visible ── */
 :focus-visible {
   @apply outline-2 outline-primary-500 outline-offset-2;
 }
 
-/* ── Page transition ── */
 .page-enter {
   opacity: 0;
   transform: translateY(8px);

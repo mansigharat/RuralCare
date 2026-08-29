@@ -34,7 +34,6 @@ export default function Navbar() {
       isActive ? 'text-primary-600' : 'text-slate-600 hover:text-primary-600'
     }`
 
-  // First letter of user's name for avatar
   const avatar = user?.name ? user.name.charAt(0).toUpperCase() : '?'
 
   return (
@@ -54,7 +53,6 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => (
               <NavLink key={link.to} to={link.to} className={linkClass} end={link.to === '/'}>
@@ -63,7 +61,6 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* Desktop Auth */}
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
               <div className="relative">
@@ -74,7 +71,7 @@ export default function Navbar() {
                   aria-label="User menu"
                   aria-expanded={userMenuOpen}
                 >
-                  {/* Avatar circle */}
+       
                   <div className="w-7 h-7 rounded-full bg-primary-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                     {avatar}
                   </div>
@@ -84,7 +81,6 @@ export default function Navbar() {
                   </svg>
                 </button>
 
-                {/* Dropdown */}
                 {userMenuOpen && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
@@ -128,7 +124,6 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile Hamburger */}
           <button
             className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -148,7 +143,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden border-t border-slate-200 bg-white">
           <nav className="px-4 py-3 space-y-1">
@@ -173,7 +167,7 @@ export default function Navbar() {
             <div className="pt-2 border-t border-slate-100 mt-2">
               {isAuthenticated ? (
                 <>
-                  {/* User info */}
+    
                   <div className="px-3 py-2.5 flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
                       {avatar}

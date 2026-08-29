@@ -1,10 +1,6 @@
 import { Link } from 'react-router-dom'
 import VerificationBadge from './VerificationBadge'
 
-/**
- * FacilityCard — displays a summary card for a healthcare facility.
- * Used in the Facilities list page and elsewhere.
- */
 export default function FacilityCard({ facility }) {
   const {
     id,
@@ -30,14 +26,13 @@ export default function FacilityCard({ facility }) {
     'Sub-Centre': 'bg-cyan-100 text-cyan-700',
   }
 
-  // Format date
   const formattedDate = lastVerified
     ? new Date(lastVerified).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
     : 'Unknown'
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-card hover:shadow-card-hover transition-shadow duration-200 p-5 flex flex-col gap-4">
-      {/* Header */}
+  
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -63,7 +58,6 @@ export default function FacilityCard({ facility }) {
         </div>
       </div>
 
-      {/* Availability indicators */}
       <div className="flex items-center gap-3 flex-wrap">
         <span className={`flex items-center gap-1 text-xs font-medium ${doctorsAvailable ? 'text-success-700' : 'text-slate-400'}`}>
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -79,7 +73,6 @@ export default function FacilityCard({ facility }) {
         </span>
       </div>
 
-      {/* Services */}
       <div className="flex flex-wrap gap-1.5">
         {services.slice(0, 4).map((s) => (
           <span key={s} className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
@@ -93,7 +86,6 @@ export default function FacilityCard({ facility }) {
         )}
       </div>
 
-      {/* Footer row */}
       <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100">
         <div className="flex flex-col gap-1">
           <VerificationBadge status={verificationStatus} />

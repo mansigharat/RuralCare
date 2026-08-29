@@ -1,13 +1,9 @@
 import { Link } from 'react-router-dom'
 
-/**
- * NotFound — 404 page shown for any unmatched route.
- */
 export default function NotFound() {
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
       <div className="text-center max-w-md w-full">
-        {/* Big 404 visual */}
         <div className="relative mb-8">
           <p className="text-[8rem] font-black text-primary-100 leading-none select-none">
             404
@@ -42,7 +38,6 @@ export default function NotFound() {
           </Link>
         </div>
 
-        {/* Emergency note */}
         <div className="mt-10 bg-red-50 border border-red-200 rounded-xl p-4">
           <p className="text-red-700 text-sm font-medium">
             <strong>Medical Emergency?</strong> Call{' '}

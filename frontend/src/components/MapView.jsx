@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import VerificationBadge from './VerificationBadge'
 
-// ─── Fix default Leaflet marker icons (common Vite/webpack issue) ─
+
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
@@ -11,7 +11,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 })
 
-// Custom coloured icons for different facility types
+
 const createFacilityIcon = (type) => {
   const colors = {
     PHC: '#2563eb',
@@ -64,7 +64,6 @@ const userIcon = L.divIcon({
   iconAnchor: [9, 9],
 })
 
-// Component to update map view when centre changes
 function MapUpdater({ centre, zoom }) {
   const map = useMap()
   useEffect(() => {
@@ -113,7 +112,6 @@ export default function MapView({
 
         <MapUpdater centre={centre} zoom={zoom} />
 
-        {/* User location marker */}
         {userLocation && (
           <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
             <Popup>
@@ -124,7 +122,6 @@ export default function MapView({
           </Marker>
         )}
 
-        {/* Facility markers */}
         {facilities.map((facility) => {
           const statusStyle = statusColors[facility.workingStatus] || statusColors.Closed
           return (
@@ -135,7 +132,7 @@ export default function MapView({
             >
               <Popup minWidth={230} maxWidth={280}>
                 <div style={{ fontFamily: 'Inter, sans-serif', padding: '2px 0' }}>
-                  {/* Type badge */}
+               
                   <div style={{
                     fontSize: '10px', fontWeight: '700', color: '#64748b',
                     textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '5px',
@@ -143,17 +140,16 @@ export default function MapView({
                     {facility.type}
                   </div>
 
-                  {/* Name */}
+               
                   <div style={{ fontSize: '14px', fontWeight: '700', color: '#0f172a', marginBottom: '5px', lineHeight: '1.3' }}>
                     {facility.name}
                   </div>
 
-                  {/* Address short */}
+
                   <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '8px', lineHeight: '1.4' }}>
                     📍 {facility.distance} km away
                   </div>
 
-                  {/* Status pill */}
                   <div style={{ marginBottom: '8px' }}>
                     <span style={{
                       fontSize: '11px', fontWeight: '600',
@@ -164,13 +160,11 @@ export default function MapView({
                     </span>
                   </div>
 
-                  {/* Services preview */}
                   <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '10px' }}>
                     {facility.services[0]}
                     {facility.services.length > 1 && ` +${facility.services.length - 1} more`}
                   </div>
 
-                  {/* Actions */}
                   <div style={{ display: 'flex', gap: '6px' }}>
                     <a
                       href={`/facilities/${facility.id}`}

@@ -23,7 +23,6 @@ function App() {
           <Navbar />
           <main className="flex-1">
             <Routes>
-              {/* Public routes */}
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
@@ -31,7 +30,6 @@ function App() {
               <Route path="/facilities/:id" element={<FacilityDetails />} />
               <Route path="/map" element={<HealthcareMap />} />
 
-              {/* Protected routes — require login */}
               <Route
                 path="/assistant"
                 element={

@@ -18,10 +18,6 @@ const INITIAL_MESSAGE = {
   timestamp: new Date(),
 }
 
-/**
- * Parse text to find if it mentions facility search actions.
- * Returns true if the AI response is recommending a facility search.
- */
 function mentionsFacilitySearch(text) {
   const lower = text.toLowerCase()
   return (
@@ -81,9 +77,6 @@ export default function AIAssistant() {
     }
   }
 
-  /**
-   * Derive a relevant facility search query hint from the user's message.
-   */
   function deriveSearchHint(userText) {
     const lower = userText.toLowerCase()
     if (lower.includes('fever') || lower.includes('cold') || lower.includes('flu')) return 'General OPD'
@@ -105,7 +98,7 @@ export default function AIAssistant() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 flex flex-col" style={{ minHeight: 'calc(100vh - 8rem)' }}>
-      {/* Header */}
+
       <div className="mb-4 flex-shrink-0">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-xl flex-shrink-0 shadow-sm">
@@ -128,7 +121,6 @@ export default function AIAssistant() {
           </div>
         </div>
 
-        {/* Disclaimer */}
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex gap-2.5">
           <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.072 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -141,7 +133,6 @@ export default function AIAssistant() {
         </div>
       </div>
 
-      {/* Suggested questions (only show at start) */}
       {messages.length <= 1 && (
         <div className="mb-3 flex-shrink-0">
           <p className="text-xs text-slate-500 mb-2 font-medium">Suggested questions:</p>
@@ -159,7 +150,6 @@ export default function AIAssistant() {
         </div>
       )}
 
-      {/* Chat window */}
       <div className="flex-1 bg-white rounded-xl border border-slate-200 shadow-card overflow-y-auto p-4 mb-4 space-y-4" style={{ minHeight: '320px' }}>
         {messages.map((msg) => (
           <div
@@ -182,7 +172,6 @@ export default function AIAssistant() {
                 {msg.text}
               </div>
 
-              {/* Facility search CTA for AI messages */}
               {msg.role === 'assistant' && msg.id !== 'welcome' && msg.showFacilityLink && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Link
@@ -228,7 +217,6 @@ export default function AIAssistant() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
       <form onSubmit={handleSubmit} className="flex gap-2 flex-shrink-0">
         <input
           ref={inputRef}
@@ -252,7 +240,6 @@ export default function AIAssistant() {
         </button>
       </form>
 
-      {/* Footer note */}
       <p className="text-center text-xs text-slate-400 mt-3 flex-shrink-0">
         Responses are powered by AI and are for guidance only. Always consult a qualified doctor.
       </p>

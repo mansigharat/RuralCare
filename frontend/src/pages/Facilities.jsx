@@ -71,7 +71,6 @@ export default function Facilities() {
         />
       </div>
 
-      {/* Mobile filter toggle */}
       <div className="flex items-center justify-between mb-4 lg:hidden">
         <p className="text-sm text-slate-600">
           {loading ? 'Loading...' : `${facilities.length} facilit${facilities.length !== 1 ? 'ies' : 'y'} found`}
@@ -87,7 +86,6 @@ export default function Facilities() {
         </button>
       </div>
 
-      {/* Mobile Filters (collapsible) */}
       {showMobileFilters && (
         <div className="lg:hidden mb-6">
           <FacilityFilters filters={filters} onChange={handleFilterChange} />
@@ -95,14 +93,13 @@ export default function Facilities() {
       )}
 
       <div className="flex gap-6">
-        {/* Desktop Sidebar Filters */}
+
         <aside className="hidden lg:block w-64 flex-shrink-0">
           <div className="sticky top-24">
             <FacilityFilters filters={filters} onChange={handleFilterChange} />
           </div>
         </aside>
 
-        {/* Results */}
         <div className="flex-1 min-w-0">
           <div className="hidden lg:flex items-center justify-between mb-4">
             <p className="text-sm text-slate-600">

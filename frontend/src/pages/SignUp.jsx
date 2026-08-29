@@ -66,7 +66,6 @@ export default function SignUp() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-slate-50">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-12 h-12 bg-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
             <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -79,7 +78,7 @@ export default function SignUp() {
 
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-7">
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            {/* Full Name */}
+
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="signup-name">
                 Full Name
@@ -96,7 +95,6 @@ export default function SignUp() {
               />
             </div>
 
-            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="signup-email">
                 Email Address
@@ -113,7 +111,6 @@ export default function SignUp() {
               />
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="signup-password">
                 Password
@@ -167,7 +164,6 @@ export default function SignUp() {
               )}
             </div>
 
-            {/* Confirm Password */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="signup-confirm-password">
                 Confirm Password
@@ -210,7 +206,6 @@ export default function SignUp() {
               )}
             </div>
 
-            {/* Role */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 I am a…

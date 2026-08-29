@@ -32,7 +32,6 @@ const features = [
   },
 ]
 
-// Compute live stats from mock data
 const openCount = mockFacilities.filter((f) => f.workingStatus === 'Open').length
 const verifiedCount = mockFacilities.filter((f) => f.verificationStatus === VERIFICATION_STATUS.VERIFIED).length
 const totalServices = [...new Set(mockFacilities.flatMap((f) => f.services))].length
@@ -89,15 +88,14 @@ export default function Home() {
 
   return (
     <div>
-      {/* ── Hero ── */}
       <section className="bg-gradient-to-br from-primary-800 via-primary-700 to-primary-600 text-white relative overflow-hidden">
-        {/* Decorative circles */}
+  
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-1/3 translate-y-1/3 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 lg:pt-24 lg:pb-28 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
-            {/* Badge */}
+        
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-primary-100 text-sm font-medium px-4 py-1.5 rounded-full mb-6 border border-white/20">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
               Government of India — Public Healthcare Platform
@@ -130,7 +128,6 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Live Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {stats.map((s) => (
                 <div key={s.label} className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3.5 border border-white/20 hover:bg-white/15 transition-colors">
@@ -143,7 +140,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Search Section ── */}
       <section className="bg-white border-b border-slate-100 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <h2 className="text-xl font-semibold text-slate-800 text-center mb-2">
@@ -172,7 +168,6 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Quick search chips */}
           <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
             <span className="text-xs text-slate-400">Quick search:</span>
             {['Maternity Care', 'Emergency', 'Vaccination', 'TB Treatment', 'Pharmacy'].map((term) => (
@@ -188,7 +183,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Feature Cards ── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="text-center mb-8">
           <h2 className="text-xl font-semibold text-slate-800 mb-2">What can RuralCare do for you?</h2>
@@ -207,7 +201,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Verification Status Explainer ── */}
       <section className="bg-slate-50 border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
           <div className="text-center mb-8">
@@ -241,7 +234,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── How it works ── */}
       <section className="border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
           <h2 className="text-xl font-semibold text-slate-800 mb-8 text-center">How it works</h2>
@@ -265,7 +257,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── CTA Banner ── */}
+
       <section className="bg-primary-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div>
@@ -284,7 +276,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Emergency Banner ── */}
       <section className="bg-red-50 border border-red-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-4">
           <div className="text-red-500 flex-shrink-0">
