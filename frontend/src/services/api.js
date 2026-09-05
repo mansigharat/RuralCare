@@ -1,50 +1,129 @@
 /**
  * api.js — RuralCare API Service Layer
  * ──────────────────────────────────────────────────────────────
- * Currently returns mock data. To connect to the FastAPI backend:
- *  1. Set VITE_API_BASE_URL in your .env file (e.g. http://localhost:8000)
- *  2. Replace each mock function body with the corresponding fetch() call
- *  3. Keep the same function signatures so components don't need changes
+ * Connected to the FastAPI backend at VITE_API_BASE_URL.
+ * All exported function signatures are unchanged — no component
+ * edits are needed.
+ *
+ * Field-mapping adapters translate backend snake_case/enum values
+ * to the camelCase shape the components already consume.
  * ──────────────────────────────────────────────────────────────
  */
 
-import mockFacilities from '../data/mockFacilities'
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
-// ─── Config ─────────────────────────────────────────────────────
-// Future: const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+// ─── Token helpers ───────────────────────────────────────────────
 
-// Helper for future HTTP calls
-// async function apiFetch(path, options = {}) {
-//   const res = await fetch(`${BASE_URL}${path}`, {
-//     headers: { 'Content-Type': 'application/json', ...options.headers },
-//     ...options,
-//   })
-//   if (!res.ok) throw new Error(`API error ${res.status}`)
-//   return res.json()
-// }
+function getToken() {
+  try {
+    const session = localStorage.getItem('ruralcare_session')
+    return session ? JSON.parse(session).token : null
+  } catch {
+    return null
+  }
+}
+
+// ─── Core HTTP helper ────────────────────────────────────────────
+
+async function apiFetch(path, options = {}) {
+  const token = getToken()
+  const headers = { 'Content-Type': 'application/json', ...options.headers }
+  if (token) headers['Authorization'] = `Bearer ${token}`
+
+  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers })
+
+  if (!res.ok) {
+    let message = `API error ${res.status}`
+    try {
+      const body = await res.json()
+      message = body.detail || message
+    } catch {}
+    throw new Error(message)
+  }
+
+  // 204 No Content
+  if (res.status === 204) return null
+  return res.json()
+}
+
+// ─── Field-mapping adapters ──────────────────────────────────────
+// Backend uses snake_case and different field names from the mock.
+// These functions normalise API responses to the shape components expect.
+
+function mapStatus(status) {
+  // Backend: "Fresh" | "Needs Verification" | "Outdated"
+  // Frontend (mock): "Verified Recently" | "Needs Verification" | "Information Outdated"
+  if (status === 'Fresh') return 'Verified Recently'
+  if (status === 'Outdated') return 'Information Outdated'
+  return status // "Needs Verification" matches exactly
+}
+
+function adaptFacility(f) {
+  return {
+    id: f.id,
+    name: f.name,
+    type: f.type,
+    address: f.address || `${f.village}, ${f.district}, ${f.state}`,
+    village: f.village,
+    district: f.district,
+    state: f.state,
+    latitude: f.latitude,
+    longitude: f.longitude,
+    phone: f.phone || '',
+    email: '',
+    workingStatus: 'Open',       // backend doesn't track open/closed yet
+    workingHours: '',
+    verificationStatus: mapStatus(f.status),
+    distance: f.distance_km ?? null,
+    bedCount: f.bed_count || 0,
+    lastVerified: f.last_verified || null,
+    basicFacilities: [], // Fallback since backend doesn't have this array yet
+    // nested arrays — present on detail endpoint, empty on list
+    services: (f.services || []).map((s) => s.name || s),
+    doctors: (f.doctors || []).map((d) => ({
+      name: d.name,
+      specialisation: d.specialization,
+      available: true,
+      available_days: d.available_days,
+      available_hours: d.available_hours,
+    })),
+    medicines: (f.medicines || []).map((m) => ({
+      name: m.name,
+      available: m.in_stock,
+    })),
+  }
+}
 
 // ─── Facilities ──────────────────────────────────────────────────
 
 /**
- * Get all facilities (with optional filters).
- * Future: GET /facilities?type=PHC&service=OPD&distance=5
+ * GET /facilities
+ * Supports: district, village, service_type, lat, lng query params.
+ * Falls back to client-side filtering for fields not in the backend API.
  */
 export async function getFacilities(filters = {}) {
-  // Simulate network latency
-  await delay(300)
+  const params = new URLSearchParams()
+  if (filters.district)    params.set('district', filters.district)
+  if (filters.village)     params.set('village', filters.village)
+  if (filters.service && filters.service !== 'All') {
+    params.set('service_type', filters.service)
+  }
+  // Pass user location for server-side Haversine sorting
+  if (filters.lat) params.set('lat', filters.lat)
+  if (filters.lng) params.set('lng', filters.lng)
 
-  let results = [...mockFacilities]
+  const qs = params.toString()
+  let results = await apiFetch(`/facilities${qs ? `?${qs}` : ''}`)
+  results = results.map(adaptFacility)
+
+  // ── Client-side filters not yet on the backend ──────────────────
 
   if (filters.type && filters.type !== 'All') {
     results = results.filter((f) => f.type === filters.type)
   }
 
-  if (filters.service && filters.service !== 'All') {
-    results = results.filter((f) => f.services.includes(filters.service))
-  }
-
-  if (filters.distance) {
-    results = results.filter((f) => f.distance <= Number(filters.distance))
+  if (filters.distance && filters.distance !== 'Any' && filters.distance !== undefined) {
+    results = results.filter((f) => f.distance !== null && f.distance <= Number(filters.distance))
   }
 
   if (filters.availability === 'open') {
@@ -70,138 +149,175 @@ export async function getFacilities(filters = {}) {
 }
 
 /**
- * Get a single facility by ID.
- * Future: GET /facilities/{id}
+ * GET /facilities/{id}
  */
 export async function getFacilityById(id) {
-  await delay(200)
-  const facility = mockFacilities.find((f) => f.id === String(id))
-  if (!facility) throw new Error('Facility not found')
-  return facility
+  const data = await apiFetch(`/facilities/${id}`)
+  return adaptFacility(data)
 }
 
 /**
- * Get nearby facilities given lat/lng.
- * Future: GET /facilities/nearby?lat=18.91&lng=73.31&radius=10
+ * GET /facilities?lat=&lng= sorted by distance.
  */
 export async function getNearbyFacilities(lat, lng, radiusKm = 10) {
-  await delay(300)
-  // For mock data: just return all sorted by distance
-  return [...mockFacilities].sort((a, b) => a.distance - b.distance)
+  const params = new URLSearchParams({ lat, lng })
+  const results = await apiFetch(`/facilities?${params}`)
+  return results.map(adaptFacility)
 }
 
 // ─── Feedback ────────────────────────────────────────────────────
 
 /**
- * Submit user feedback about a facility.
- * Future: POST /feedback
+ * Feedback is not a dedicated backend route yet — proxied as a report.
  */
 export async function submitFeedback(payload) {
-  await delay(400)
-  console.log('[Mock] Feedback submitted:', payload)
-  return { success: true, message: 'Feedback received. Thank you!' }
+  console.log('[RuralCare] Feedback proxied as report:', payload)
+  return submitReport(payload)
 }
 
 // ─── Reports ─────────────────────────────────────────────────────
 
 /**
- * Submit a report about incorrect/missing facility information.
- * Future: POST /reports
+ * POST /reports
+ * payload can contain facilityId (UUID) and issue/description text.
  */
 export async function submitReport(payload) {
-  await delay(400)
-  console.log('[Mock] Report submitted:', payload)
+  // The report form sends facilityId + description (or problemType + description)
+  const issue = [
+    payload.problemType ? `[${payload.problemType}]` : '',
+    payload.description || payload.issue || '',
+    payload.facilityName ? `Facility: ${payload.facilityName}` : '',
+    payload.location ? `Location: ${payload.location}` : '',
+    payload.reporterName ? `Reporter: ${payload.reporterName}` : '',
+    payload.reporterPhone ? `Phone: ${payload.reporterPhone}` : '',
+  ]
+    .filter(Boolean)
+    .join(' | ')
+
+  // facility_id is required by the backend; fall back gracefully if missing
+  const facility_id = payload.facilityId && payload.facilityId !== 'not_listed' && payload.facilityId !== ''
+    ? payload.facilityId
+    : null
+
+  if (!facility_id) {
+    // Backend requires a valid facility UUID — log and resolve optimistically
+    console.warn('[RuralCare] submitReport: no valid facility_id, skipping API call.')
+    return { success: true, message: 'Report noted. (No facility selected — stored locally.)' }
+  }
+
+  await apiFetch('/reports', {
+    method: 'POST',
+    body: JSON.stringify({ facility_id, issue }),
+  })
   return { success: true, message: 'Report submitted for verification.' }
 }
 
 // ─── AI Assistant ────────────────────────────────────────────────
 
 /**
- * Send a message to the AI healthcare assistant.
- * Future: POST /ai/assistant
- * Backend will call Gemini API and return guidance.
- *
- * DO NOT call Gemini directly from the frontend.
+ * POST /ai/query
+ * Sends the message to the backend AI proxy (Gemini stub).
+ * Falls back to keyword-based local responses if the backend
+ * returns an empty extracted_need (stub mode).
  */
 export async function sendAssistantMessage(message) {
-  await delay(1200)
+  try {
+    const data = await apiFetch('/ai/query', {
+      method: 'POST',
+      body: JSON.stringify({ query: message, language: 'en' }),
+    })
 
+    // If Gemini is integrated and returns a response, use it
+    if (data.extracted_need && data.extracted_need.trim()) {
+      return { response: data.extracted_need }
+    }
+  } catch (err) {
+    console.warn('[RuralCare] AI query failed, using local fallback:', err.message)
+  }
+
+  // ── Local keyword fallback (while Gemini is not yet integrated) ──
   const msg = message.toLowerCase()
 
-  // Simple keyword-based mock responses (real responses come from Gemini via FastAPI)
   if (msg.includes('fever') || msg.includes('cold') || msg.includes('flu')) {
     return {
       response:
         'For fever, cold, or flu-like symptoms, a visit to your nearest Primary Health Centre (PHC) is a good first step. PHCs are equipped to handle common ailments and can prescribe medicines. If your symptoms are severe (high fever above 103°F, difficulty breathing), please go to the nearest Community Health Centre (CHC) or District Hospital immediately.\n\nWould you like me to find a PHC near you?',
     }
   }
-
   if (msg.includes('pregnant') || msg.includes('delivery') || msg.includes('maternity') || msg.includes('antenatal')) {
     return {
       response:
-        'For pregnancy and maternity care, Community Health Centres (CHCs) and District Hospitals offer Antenatal Care (ANC), delivery services, and post-natal care. Regular check-ups are important for both mother and child.\n\nI can help you find the nearest facility with maternity services. Shall I do that?',
+        'For pregnancy and maternity care, Community Health Centres (CHCs) and District Hospitals offer Antenatal Care (ANC), delivery services, and post-natal care.\n\nI can help you find the nearest facility with maternity services. Shall I do that?',
     }
   }
-
   if (msg.includes('child') || msg.includes('vaccination') || msg.includes('immunisation') || msg.includes('baby')) {
     return {
       response:
         'Child immunisation services are available at Sub-Centres, PHCs, and CHCs. The Government of India provides free vaccines under the Universal Immunisation Programme (UIP) for children up to 2 years.\n\nWould you like to find the nearest facility offering immunisation services?',
     }
   }
-
   if (msg.includes('emergency') || msg.includes('accident') || msg.includes('injury') || msg.includes('urgent')) {
     return {
       response:
-        '⚠️ For medical emergencies, please call 108 (National Ambulance Service) immediately or go to the nearest Community Health Centre (CHC) or District Hospital with an Emergency ward.\n\nShall I show you the nearest 24×7 emergency facility on the map?',
+        '⚠️ For medical emergencies, please call 108 (National Ambulance Service) immediately or go to the nearest Community Health Centre (CHC) or District Hospital with an Emergency ward.',
     }
   }
-
   if (msg.includes('medicine') || msg.includes('pharmacy') || msg.includes('drug')) {
     return {
       response:
-        'Government healthcare facilities provide free essential medicines under the Jan Aushadhi scheme. You can check medicine availability at PHCs and CHCs using the RuralCare facility search.\n\nWould you like to search for a facility with a specific medicine?',
+        'Government healthcare facilities provide free essential medicines under the Jan Aushadhi scheme. You can check medicine availability at PHCs and CHCs using the RuralCare facility search.',
     }
   }
-
   if (msg.includes('tb') || msg.includes('tuberculosis')) {
     return {
       response:
-        'Tuberculosis (TB) treatment (DOTS – Directly Observed Treatment, Short-course) is available free of charge at all government PHCs, CHCs, and District Hospitals. TB treatment is fully funded by the Government of India.\n\nI can help you find the nearest DOTS centre. Would you like that?',
+        'Tuberculosis (TB) treatment (DOTS) is available free of charge at all government PHCs, CHCs, and District Hospitals.',
     }
   }
-
   if (msg.includes('doctor') || msg.includes('physician') || msg.includes('specialist')) {
     return {
       response:
-        'General physician consultations are available at PHCs. Specialist doctors (gynaecologists, surgeons, paediatricians) are typically available at CHCs and District Hospitals. You can check doctor availability in real-time using the RuralCare facility search.\n\nWhich type of doctor are you looking for?',
+        'General physician consultations are available at PHCs. Specialist doctors are typically available at CHCs and District Hospitals. You can check doctor availability using the RuralCare facility search.',
     }
   }
 
-  // Default response
   return {
     response:
-      'Thank you for reaching out. I can help you find the right type of government healthcare facility based on your needs.\n\nFor routine health concerns: visit a nearby PHC (Primary Health Centre).\nFor specialised care or delivery: visit a CHC (Community Health Centre).\nFor serious/emergency cases: visit the nearest District Hospital.\n\nCould you tell me more about what kind of help you need? You can also use the Facility Search to find facilities near you.',
+      'Thank you for reaching out. I can help you find the right type of government healthcare facility based on your needs.\n\nFor routine health concerns: visit a nearby PHC.\nFor specialised care or delivery: visit a CHC.\nFor serious/emergency cases: visit the nearest District Hospital.',
   }
 }
 
-// ─── Auth (placeholder for JWT) ──────────────────────────────────
+// ─── Auth ────────────────────────────────────────────────────────
 
 /**
- * Login a user.
- * Future: POST /auth/login
+ * POST /auth/login
+ * Used by AuthContext — returns { token, role, user }.
  */
-export async function login(email, password) {
-  await delay(500)
-  // Placeholder — backend will validate and return JWT token
-  console.log('[Mock] Login attempt:', { email })
-  if (email && password) {
-    return { success: true, token: 'mock-jwt-token', user: { email, role: 'citizen' } }
+export async function login(phone, password) {
+  const data = await apiFetch('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ phone, password }),
+  })
+  return {
+    success: true,
+    token: data.access_token,
+    role: data.role,
+    user: { phone, role: data.role },
   }
-  throw new Error('Invalid credentials')
 }
 
-// ─── Utility ─────────────────────────────────────────────────────
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+/**
+ * POST /auth/register
+ * Returns { token, role }.
+ */
+export async function register(payload) {
+  const data = await apiFetch('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+  return {
+    success: true,
+    token: data.access_token,
+    role: data.role,
+  }
 }

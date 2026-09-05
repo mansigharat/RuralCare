@@ -1,8 +1,7 @@
-
 import { createContext, useContext, useState, useCallback } from 'react'
+import { login, register } from '../services/api'
 
 const STORAGE_KEY = 'ruralcare_session'
-const USERS_KEY = 'ruralcare_users'
 
 function readSession() {
   try {
@@ -23,63 +22,40 @@ function writeSession(user) {
   } catch {}
 }
 
-function readUsers() {
-  try {
-    const raw = localStorage.getItem(USERS_KEY)
-    return raw ? JSON.parse(raw) : []
-  } catch {
-    return []
-  }
-}
-
-function writeUsers(users) {
-  try {
-    localStorage.setItem(USERS_KEY, JSON.stringify(users))
-  } catch {}
-}
-
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => readSession())
 
   const signUp = useCallback(async ({ name, email, password, role }) => {
-    await new Promise((r) => setTimeout(r, 500))
-    const users = readUsers()
-    const exists = users.find((u) => u.email.toLowerCase() === email.toLowerCase())
-    if (exists) {
-      throw new Error('An account with this email already exists.')
-    }
-    const newUser = {
-      id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-      name,
-      email,
+    // Note: The UI calls the phone number field "email" for now. 
+    // We send it to the backend as phone.
+    const res = await register({
+      phone: email, 
       password,
-      role,
-      createdAt: new Date().toISOString(),
+      role: role || 'citizen',
+    })
+    
+    if (res.success) {
+      const sessionUser = { token: res.token, phone: email, role: res.role }
+      writeSession(sessionUser)
+      setUser(sessionUser)
+      return { success: true }
     }
-    writeUsers([...users, newUser])
-    const sessionUser = { id: newUser.id, name, email, role }
-    writeSession(sessionUser)
-    setUser(sessionUser)
-    return { success: true }
+    throw new Error('Registration failed')
   }, [])
 
   const logIn = useCallback(async ({ email, password }) => {
-    await new Promise((r) => setTimeout(r, 500))
-    const users = readUsers()
-    const found = users.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-    )
-    if (!found) {
-      throw new Error('Invalid email or password. Please try again.')
+    // The UI uses 'email' field, but the backend expects 'phone'
+    const res = await login(email, password)
+    if (res.success) {
+      const sessionUser = { token: res.token, phone: email, role: res.role }
+      writeSession(sessionUser)
+      setUser(sessionUser)
+      return { success: true }
     }
-    const sessionUser = { id: found.id, name: found.name, email: found.email, role: found.role }
-    writeSession(sessionUser)
-    setUser(sessionUser)
-    return { success: true }
+    throw new Error('Login failed')
   }, [])
-
 
   const logOut = useCallback(() => {
     writeSession(null)
