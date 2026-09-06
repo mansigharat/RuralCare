@@ -17,10 +17,10 @@ const LANGUAGES = [
   { code: 'mr', label: 'मराठी' },
 ]
 
-const ROLE_LABELS = {
-  citizen: 'Citizen',
-  healthcare_worker: 'Healthcare Worker',
-  government: 'Government',
+const ROLE_KEYS = {
+  citizen: 'roles.citizen',
+  healthcare_worker: 'roles.healthcare_worker',
+  government: 'roles.government',
 }
 
 export default function Navbar() {
@@ -107,7 +107,7 @@ export default function Navbar() {
                   id="user-menu-button"
                   onClick={() => setUserMenuOpen((v) => !v)}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
-                  aria-label="User menu"
+                  aria-label={t('navbar.userMenu', 'User menu')}
                   aria-expanded={userMenuOpen}
                 >
                   <div className="w-7 h-7 rounded-full bg-primary-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
@@ -127,7 +127,7 @@ export default function Navbar() {
                         <p className="text-sm font-semibold text-slate-800 truncate">{user.name}</p>
                         <p className="text-xs text-slate-500 truncate">{user.email}</p>
                         <span className="inline-block mt-1 text-[10px] font-medium bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full">
-                          {ROLE_LABELS[user.role] || user.role}
+                          {t(ROLE_KEYS[user.role] || 'roles.citizen', user.role)}
                         </span>
                       </div>
                       <button
@@ -165,7 +165,7 @@ export default function Navbar() {
           <button
             className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
             onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle navigation menu"
+            aria-label={t('navbar.toggleNav', 'Toggle navigation menu')}
             aria-expanded={menuOpen}
           >
             {menuOpen ? (
@@ -232,7 +232,7 @@ export default function Navbar() {
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-slate-800 truncate">{user.name}</p>
-                      <p className="text-xs text-slate-500">{ROLE_LABELS[user.role] || user.role}</p>
+                      <p className="text-xs text-slate-500">{t(ROLE_KEYS[user.role] || 'roles.citizen', user.role)}</p>
                     </div>
                   </div>
                   <button

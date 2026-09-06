@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 export default function NotFound() {
+  const { t } = useTranslation()
+
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
       <div className="text-center max-w-md w-full">
@@ -17,10 +20,9 @@ export default function NotFound() {
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">Page Not Found</h1>
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">{t('notFound.title', 'Page Not Found')}</h1>
         <p className="text-slate-500 text-sm leading-relaxed mb-8">
-          The page you are looking for doesn't exist or has been moved.
-          Try searching for a healthcare facility instead.
+          {t('notFound.desc', "The page you are looking for doesn't exist or has been moved. Try searching for a healthcare facility instead.")}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -28,21 +30,21 @@ export default function NotFound() {
             to="/"
             className="bg-primary-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-primary-700 transition-colors text-sm"
           >
-            ← Back to Home
+            {t('notFound.backHome', '← Back to Home')}
           </Link>
           <Link
             to="/facilities"
             className="border-2 border-slate-200 text-slate-700 font-semibold px-6 py-3 rounded-xl hover:border-primary-300 hover:text-primary-600 transition-colors text-sm"
           >
-            🔍 Find Healthcare
+            {t('notFound.findHealthcare', '🔍 Find Healthcare')}
           </Link>
         </div>
 
         <div className="mt-10 bg-red-50 border border-red-200 rounded-xl p-4">
           <p className="text-red-700 text-sm font-medium">
-            <strong>Medical Emergency?</strong> Call{' '}
-            <a href="tel:108" className="underline font-bold">108</a> (Ambulance) or{' '}
-            <a href="tel:102" className="underline font-bold">102</a> (Maternity) immediately.
+            <strong>{t('home.emergencyPrefix', 'Medical Emergency?')}</strong> {t('home.emergencyCall', 'Call')}{' '}
+            <a href="tel:108" className="underline font-bold">108</a> ({t('footer.ambulanceName', 'Ambulance')}) {t('auth.or', 'or')}{' '}
+            <a href="tel:102" className="underline font-bold">102</a> ({t('footer.maternityName', 'Maternity')}) {t('home.immediately', 'immediately.')}
           </p>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
+import { useTranslation } from 'react-i18next'
 import VerificationBadge from './VerificationBadge'
 
 
@@ -92,6 +93,7 @@ export default function MapView({
   height = '500px',
   onFacilitySelect = null,
 }) {
+  const { t } = useTranslation()
   const statusColors = {
     Open: { bg: '#dcfce7', color: '#15803d' },
     Closed: { bg: '#f1f5f9', color: '#64748b' },
@@ -116,7 +118,7 @@ export default function MapView({
           <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
             <Popup>
               <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '13px', fontWeight: '600', color: '#0f172a' }}>
-                📍 Your Location
+                📍 {t('map.yourLocation', 'Your Location')}
               </div>
             </Popup>
           </Marker>
@@ -147,7 +149,7 @@ export default function MapView({
 
 
                   <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '8px', lineHeight: '1.4' }}>
-                    📍 {facility.distance} km away
+                    📍 {facility.distance} km {t('facilities.away', 'away')}
                   </div>
 
                   <div style={{ marginBottom: '8px' }}>
@@ -156,13 +158,13 @@ export default function MapView({
                       padding: '3px 8px', borderRadius: '9999px',
                       background: statusStyle.bg, color: statusStyle.color,
                     }}>
-                      {facility.workingStatus === 'Open' ? '● Open Now' : '● Closed'}
+                      {facility.workingStatus === 'Open' ? t('facilities.openNow', '● Open') : t('facilities.closed', '● Closed')}
                     </span>
                   </div>
 
                   <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '10px' }}>
                     {facility.services[0]}
-                    {facility.services.length > 1 && ` +${facility.services.length - 1} more`}
+                    {facility.services.length > 1 && ` ${t('facilities.moreServices', '+{{count}} more', { count: facility.services.length - 1 })}`}
                   </div>
 
                   <div style={{ display: 'flex', gap: '6px' }}>
@@ -182,7 +184,7 @@ export default function MapView({
                         }
                       }}
                     >
-                      View Details
+                      {t('facilities.viewDetails', 'View Details')}
                     </a>
                     {facility.phone && (
                       <a

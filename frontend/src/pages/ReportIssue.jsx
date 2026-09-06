@@ -1,20 +1,22 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { submitReport } from '../services/api'
 import mockFacilities from '../data/mockFacilities'
 
-const PROBLEM_TYPES = [
-  { value: 'missing_facility', label: '🏥 Missing Facility — This facility is not listed' },
-  { value: 'incorrect_info', label: '✏️ Incorrect Information — Name, address, or hours are wrong' },
-  { value: 'service_unavailable', label: '🚫 Service Unavailable — A listed service is not actually provided' },
-  { value: 'medicine_unavailable', label: '💊 Medicine Unavailable — A listed medicine is out of stock' },
-  { value: 'doctor_unavailable', label: '👨‍⚕️ Doctor Unavailable — Listed doctor is not currently available' },
-  { value: 'other', label: '📝 Other Issue' },
-]
-
 export default function ReportIssue() {
+  const { t } = useTranslation()
   const [searchParams] = useSearchParams()
   const prefilledId = searchParams.get('facilityId') || ''
+
+  const PROBLEM_TYPES = [
+    { value: 'missing_facility', label: t('report.missingFacility', '🏥 Missing Facility — This facility is not listed') },
+    { value: 'incorrect_info', label: t('report.incorrectInfo', '✏️ Incorrect Information — Name, address, or hours are wrong') },
+    { value: 'service_unavailable', label: t('report.serviceUnavailable', '🚫 Service Unavailable — A listed service is not actually provided') },
+    { value: 'medicine_unavailable', label: t('report.medicineUnavailable', '💊 Medicine Unavailable — A listed medicine is out of stock') },
+    { value: 'doctor_unavailable', label: t('report.doctorUnavailable', '👨‍⚕️ Doctor Unavailable — Listed doctor is not currently available') },
+    { value: 'other', label: t('report.otherIssue', '📝 Other Issue') },
+  ]
 
   const [formData, setFormData] = useState({
     facilityId: prefilledId,
@@ -34,11 +36,12 @@ export default function ReportIssue() {
       setFormData((prev) => ({ ...prev, facilityId: prefilledId }))
     }
   }, [prefilledId])
+
   const validate = () => {
     const errs = {}
-    if (!formData.problemType) errs.problemType = 'Please select a problem type.'
+    if (!formData.problemType) errs.problemType = t('report.selectProblemTypeError', 'Please select a problem type.')
     if (!formData.description.trim() || formData.description.trim().length < 15)
-      errs.description = 'Please provide at least 15 characters of description.'
+      errs.description = t('report.descriptionLengthError', 'Please provide at least 15 characters of description.')
     return errs
   }
 
@@ -58,7 +61,7 @@ export default function ReportIssue() {
       await submitReport(formData)
       setSubmitted(true)
     } catch {
-      setErrors({ form: 'Submission failed. Please try again.' })
+      setErrors({ form: t('report.submissionFailed', 'Submission failed. Please try again.') })
     } finally {
       setLoading(false)
     }
@@ -69,18 +72,18 @@ export default function ReportIssue() {
       <div className="max-w-xl mx-auto px-4 sm:px-6 py-16 text-center">
         <div className="bg-success-50 border border-success-200 rounded-2xl p-10">
           <div className="text-6xl mb-4">✅</div>
-          <h2 className="text-2xl font-bold text-success-700 mb-3">Report Submitted!</h2>
+          <h2 className="text-2xl font-bold text-success-700 mb-3">{t('report.submittedTitle', 'Report Submitted!')}</h2>
           <p className="text-slate-600 text-base leading-relaxed mb-6">
-            Thank you. Your report has been submitted for verification. Authorised healthcare workers will review and update the information.
+            {t('report.submittedText', 'Thank you. Your report has been submitted for verification. Authorised healthcare workers will review and update the information.')}
           </p>
           <p className="text-sm text-slate-500 mb-8">
-            Your contribution helps keep RuralCare information accurate for your community.
+            {t('report.contributionText', 'Your contribution helps keep RuralCare information accurate for your community.')}
           </p>
           <button
             onClick={() => { setSubmitted(false); setFormData({ facilityId: '', facilityName: '', problemType: '', description: '', reporterName: '', reporterPhone: '', location: '' }) }}
             className="bg-primary-600 text-white font-semibold px-8 py-3 rounded-xl hover:bg-primary-700 transition-colors text-sm"
           >
-            Submit Another Report
+            {t('report.submitAnother', 'Submit Another Report')}
           </button>
         </div>
       </div>
@@ -90,9 +93,9 @@ export default function ReportIssue() {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Report Incorrect Information</h1>
+        <h1 className="text-2xl font-bold text-slate-900">{t('report.title', 'Report Incorrect Information')}</h1>
         <p className="text-slate-500 text-sm mt-1">
-          Help keep RuralCare accurate. Your report will be reviewed by authorised healthcare workers.
+          {t('report.subtitle', 'Help keep RuralCare accurate. Your report will be reviewed by authorised healthcare workers.')}
         </p>
       </div>
 
@@ -101,7 +104,7 @@ export default function ReportIssue() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <p className="text-sm text-blue-800">
-          You don't need to create an account to submit a report. Reports are reviewed and used only to improve facility information.
+          {t('report.notice', "You don't need to create an account to submit a report. Reports are reviewed and used only to improve facility information.")}
         </p>
       </div>
 
@@ -109,7 +112,7 @@ export default function ReportIssue() {
 
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1.5">
-            Facility (optional)
+            {t('report.facilityOptional', 'Facility (optional)')}
           </label>
           <select
             name="facilityId"
@@ -117,11 +120,11 @@ export default function ReportIssue() {
             onChange={handleChange}
             className="w-full text-sm border border-slate-200 rounded-xl px-4 py-3 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
           >
-            <option value="">Select a facility (or type below)</option>
+            <option value="">{t('report.selectFacility', 'Select a facility (or type below)')}</option>
             {mockFacilities.map((f) => (
               <option key={f.id} value={f.id}>{f.name}</option>
             ))}
-            <option value="not_listed">Facility not listed here</option>
+            <option value="not_listed">{t('report.facilityNotListed', 'Facility not listed here')}</option>
           </select>
 
           {(formData.facilityId === 'not_listed' || formData.facilityId === '') && (
@@ -130,7 +133,7 @@ export default function ReportIssue() {
               name="facilityName"
               value={formData.facilityName}
               onChange={handleChange}
-              placeholder="Enter facility name (if known)"
+              placeholder={t('report.facilityNamePlaceholder', 'Enter facility name (if known)')}
               className="w-full mt-2 text-sm border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-400 text-slate-700"
             />
           )}
@@ -138,7 +141,7 @@ export default function ReportIssue() {
 
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1.5">
-            Problem Type <span className="text-red-500">*</span>
+            {t('report.problemType', 'Problem Type')} <span className="text-red-500">*</span>
           </label>
           <div className="space-y-2">
             {PROBLEM_TYPES.map((p) => (
@@ -160,14 +163,14 @@ export default function ReportIssue() {
 
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1.5">
-            Description <span className="text-red-500">*</span>
+            {t('report.description', 'Description')} <span className="text-red-500">*</span>
           </label>
           <textarea
             name="description"
             value={formData.description}
             onChange={handleChange}
             rows={4}
-            placeholder="Please describe the issue clearly. For example: 'The phone number listed is incorrect — the correct number is 02143-XXXXXX'"
+            placeholder={t('report.descriptionPlaceholder', "Please describe the issue clearly. For example: 'The phone number listed is incorrect — the correct number is 02143-XXXXXX'")}
             className="w-full text-sm border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-400 text-slate-700 resize-none"
           />
           <div className="flex justify-between mt-1">
@@ -175,44 +178,44 @@ export default function ReportIssue() {
               ? <p className="text-xs text-red-500">{errors.description}</p>
               : <span />
             }
-            <p className="text-xs text-slate-400">{formData.description.length} chars</p>
+            <p className="text-xs text-slate-400">{formData.description.length} {t('report.chars', 'chars')}</p>
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1.5">
-            Your Location (optional)
+            {t('report.locationOptional', 'Your Location (optional)')}
           </label>
           <input
             type="text"
             name="location"
             value={formData.location}
             onChange={handleChange}
-            placeholder="Village, town, or district — helps us verify the report"
+            placeholder={t('report.locationPlaceholder', 'Village, town, or district — helps us verify the report')}
             className="w-full text-sm border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-400 text-slate-700"
           />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Your Name (optional)</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('report.nameOptional', 'Your Name (optional)')}</label>
             <input
               type="text"
               name="reporterName"
               value={formData.reporterName}
               onChange={handleChange}
-              placeholder="Anonymous if left blank"
+              placeholder={t('report.namePlaceholder', 'Anonymous if left blank')}
               className="w-full text-sm border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-400 text-slate-700"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Phone (optional)</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('report.phoneOptional', 'Phone (optional)')}</label>
             <input
               type="tel"
               name="reporterPhone"
               value={formData.reporterPhone}
               onChange={handleChange}
-              placeholder="For follow-up if needed"
+              placeholder={t('report.phonePlaceholder', 'For follow-up if needed')}
               className="w-full text-sm border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-400 text-slate-700"
             />
           </div>
@@ -227,11 +230,11 @@ export default function ReportIssue() {
           disabled={loading}
           className="w-full bg-primary-600 text-white font-semibold py-3.5 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-60 text-sm"
         >
-          {loading ? 'Submitting Report...' : 'Submit Report'}
+          {loading ? t('report.submitting', 'Submitting Report...') : t('report.submit', 'Submit Report')}
         </button>
 
         <p className="text-xs text-slate-500 text-center">
-          Your report will be reviewed by the RuralCare team and verified healthcare workers.
+          {t('report.reviewNote', 'Your report will be reviewed by the RuralCare team and verified healthcare workers.')}
         </p>
       </form>
     </div>

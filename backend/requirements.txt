@@ -8,3 +8,4 @@ passlib[bcrypt]
 python-dotenv
 pydantic
 pydantic[email]
+google-genai

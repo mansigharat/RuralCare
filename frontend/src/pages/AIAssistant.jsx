@@ -1,22 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { sendAssistantMessage } from '../services/api'
-
-const SUGGESTED_QUESTIONS = [
-  'I have a fever — where should I go?',
-  'Where can I find maternity services?',
-  'My child needs vaccination — which facility?',
-  'Is there a 24-hour emergency facility nearby?',
-  'Where can I get TB treatment?',
-  'How do I find available medicines?',
-]
-
-const INITIAL_MESSAGE = {
-  id: 'welcome',
-  role: 'assistant',
-  text: 'Hello! I am the RuralCare AI Assistant. I can help you find the right type of government healthcare facility based on your needs, and provide general healthcare guidance.\n\nWhat healthcare help do you need today?',
-  timestamp: new Date(),
-}
 
 function mentionsFacilitySearch(text) {
   const lower = text.toLowerCase()
@@ -30,12 +15,29 @@ function mentionsFacilitySearch(text) {
 }
 
 export default function AIAssistant() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
-  const [messages, setMessages] = useState([INITIAL_MESSAGE])
+  const [messages, setMessages] = useState([
+    {
+      id: 'welcome',
+      role: 'assistant',
+      text: t('assistant.welcomeMessage', 'Hello! I am the RuralCare AI Assistant. I can help you find the right type of government healthcare facility based on your needs, and provide general healthcare guidance.\n\nWhat healthcare help do you need today?'),
+      timestamp: new Date(),
+    },
+  ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
+
+  const SUGGESTED_QUESTIONS = [
+    t('assistant.qFever', 'I have a fever — where should I go?'),
+    t('assistant.qMaternity', 'Where can I find maternity services?'),
+    t('assistant.qVaccination', 'My child needs vaccination — which facility?'),
+    t('assistant.qEmergency', 'Is there a 24-hour emergency facility nearby?'),
+    t('assistant.qTB', 'Where can I get TB treatment?'),
+    t('assistant.qMedicines', 'How do I find available medicines?'),
+  ]
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -65,7 +67,7 @@ export default function AIAssistant() {
         {
           id: Date.now() + 1,
           role: 'assistant',
-          text: 'Sorry, I could not get a response right now. Please try again, or use the facility search to find a healthcare facility near you.',
+          text: t('assistant.errorResponse', 'Sorry, I could not get a response right now. Please try again, or use the facility search to find a healthcare facility near you.'),
           timestamp: new Date(),
           showFacilityLink: true,
           searchHint: '',
@@ -105,10 +107,10 @@ export default function AIAssistant() {
             🤖
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-900">RuralCare AI Assistant</h1>
+            <h1 className="text-xl font-bold text-slate-900">{t('assistant.title', 'RuralCare AI Assistant')}</h1>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-              <p className="text-xs text-slate-500">Online — ready to help</p>
+              <p className="text-xs text-slate-500">{t('assistant.online', 'Online — ready to help')}</p>
             </div>
           </div>
           <div className="ml-auto">
@@ -116,7 +118,7 @@ export default function AIAssistant() {
               to="/facilities"
               className="text-xs font-medium text-primary-600 border border-primary-200 bg-primary-50 px-3 py-1.5 rounded-lg hover:bg-primary-100 transition-colors"
             >
-              🔍 Find Facilities
+              {t('assistant.findFacilities', '🔍 Find Facilities')}
             </Link>
           </div>
         </div>
@@ -126,16 +128,14 @@ export default function AIAssistant() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.072 16.5c-.77.833.192 2.5 1.732 2.5z" />
           </svg>
           <p className="text-xs text-amber-800 leading-relaxed">
-            <strong>Important Disclaimer:</strong> The AI Assistant provides general healthcare guidance and facility navigation only.
-            It is <strong>not a doctor</strong> and does <strong>not provide medical diagnosis or treatment advice</strong>.
-            For emergencies, call <a href="tel:108" className="underline font-bold">108</a>.
+            <strong>{t('assistant.disclaimerTitle', 'Important Disclaimer:')}</strong> {t('assistant.disclaimerText', 'The AI Assistant provides general healthcare guidance and facility navigation only. It is not a doctor and does not provide medical diagnosis or treatment advice. For emergencies, call 108.')}
           </p>
         </div>
       </div>
 
       {messages.length <= 1 && (
         <div className="mb-3 flex-shrink-0">
-          <p className="text-xs text-slate-500 mb-2 font-medium">Suggested questions:</p>
+          <p className="text-xs text-slate-500 mb-2 font-medium">{t('assistant.suggestedQuestions', 'Suggested questions:')}</p>
           <div className="flex flex-wrap gap-2">
             {SUGGESTED_QUESTIONS.map((q) => (
               <button
@@ -157,7 +157,7 @@ export default function AIAssistant() {
             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {msg.role === 'assistant' && (
-              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center text-sm flex-shrink-0 mr-2 mt-0.5">
+              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center text-sm mr-2 flex-shrink-0 mt-0.5">
                 🤖
               </div>
             )}
@@ -181,13 +181,13 @@ export default function AIAssistant() {
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                    {msg.searchHint ? `Search "${msg.searchHint}"` : 'Find Facilities'}
+                    {msg.searchHint ? t('assistant.searchPrompt', 'Search "{{hint}}"', { hint: msg.searchHint }) : t('assistant.findFacilities', '🔍 Find Facilities')}
                   </Link>
                   <Link
                     to="/map"
                     className="inline-flex items-center gap-1.5 text-xs font-medium border border-primary-200 text-primary-600 px-3 py-1.5 rounded-lg hover:bg-primary-50 transition-colors"
                   >
-                    🗺️ View Map
+                    {t('assistant.viewMap', '🗺️ View Map')}
                   </Link>
                 </div>
               )}
@@ -223,7 +223,7 @@ export default function AIAssistant() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask about a symptom, facility type, or service..."
+          placeholder={t('assistant.placeholder', 'Ask about a symptom, facility type, or service...')}
           disabled={loading}
           className="flex-1 text-sm border border-slate-200 rounded-xl px-4 py-3 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 disabled:opacity-60 shadow-sm"
         />
@@ -232,7 +232,7 @@ export default function AIAssistant() {
           disabled={loading || !input.trim()}
           id="ai-send-btn"
           className="bg-primary-600 text-white px-5 py-3 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-40 flex-shrink-0 shadow-sm"
-          aria-label="Send message"
+          aria-label={t('assistant.send', 'Send message')}
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -241,7 +241,7 @@ export default function AIAssistant() {
       </form>
 
       <p className="text-center text-xs text-slate-400 mt-3 flex-shrink-0">
-        Responses are powered by AI and are for guidance only. Always consult a qualified doctor.
+        {t('assistant.footerNote', 'Responses are powered by AI and are for guidance only. Always consult a qualified doctor.')}
       </p>
     </div>
   )

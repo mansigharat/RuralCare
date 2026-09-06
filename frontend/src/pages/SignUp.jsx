@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 
 const ROLES = [
-  { value: 'citizen',           label: 'Citizen',            desc: 'Access healthcare facilities near you',          icon: '👤' },
-  { value: 'healthcare_worker', label: 'Healthcare Worker',  desc: 'Manage facility info and patient records',       icon: '🩺' },
-  { value: 'government',        label: 'Government Official', desc: 'Monitor and verify healthcare infrastructure', icon: '🏛️' },
+  { value: 'citizen',           labelKey: 'roles.citizen',            descKey: 'roles.citizenDesc',          icon: '👤' },
+  { value: 'healthcare_worker', labelKey: 'roles.healthcare_worker',  descKey: 'roles.workerDesc',           icon: '🩺' },
+  { value: 'government',        labelKey: 'roles.government',         descKey: 'roles.govDesc',              icon: '🏛️' },
 ]
 
 export default function SignUp() {
+  const { t } = useTranslation()
   const { signUp } = useAuth()
   const navigate = useNavigate()
 
@@ -31,12 +33,12 @@ export default function SignUp() {
   }
 
   const validate = () => {
-    if (!formData.name.trim()) return 'Please enter your full name.'
-    if (!formData.email.trim()) return 'Please enter your email address.'
-    if (!formData.email.includes('@')) return 'Please enter a valid email address.'
-    if (formData.password.length < 6) return 'Password must be at least 6 characters.'
-    if (formData.password !== formData.confirmPassword) return 'Passwords do not match.'
-    if (!formData.role) return 'Please select your role.'
+    if (!formData.name.trim()) return t('auth.enterName', 'Please enter your full name.')
+    if (!formData.email.trim()) return t('auth.enterEmailPass', 'Please enter your email address.')
+    if (!formData.email.includes('@')) return t('auth.enterValidEmail', 'Please enter a valid email address.')
+    if (formData.password.length < 6) return t('auth.passwordLength', 'Password must be at least 6 characters.')
+    if (formData.password !== formData.confirmPassword) return t('auth.passwordsDoNotMatch', 'Passwords do not match.')
+    if (!formData.role) return t('auth.selectRole', 'Please select your role.')
     return null
   }
 
@@ -57,7 +59,7 @@ export default function SignUp() {
       })
       navigate('/', { replace: true })
     } catch (err) {
-      setError(err.message || 'Failed to create account. Please try again.')
+      setError(err.message || t('auth.createAccountFailed', 'Failed to create account. Please try again.'))
     } finally {
       setLoading(false)
     }
@@ -72,8 +74,8 @@ export default function SignUp() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">Create your account</h1>
-          <p className="text-slate-500 text-sm mt-1">Join RuralCare — healthcare access for everyone</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('auth.createAccountTitle', 'Create your account')}</h1>
+          <p className="text-slate-500 text-sm mt-1">{t('auth.createAccountSubtitle', 'Join RuralCare — healthcare access for everyone')}</p>
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-7">
@@ -81,7 +83,7 @@ export default function SignUp() {
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="signup-name">
-                Full Name
+                {t('auth.fullName', 'Full Name')}
               </label>
               <input
                 id="signup-name"
@@ -89,7 +91,7 @@ export default function SignUp() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Ravi Kumar"
+                placeholder={t('auth.namePlaceholder', 'Ravi Kumar')}
                 autoComplete="name"
                 className="w-full text-sm border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-400 text-slate-700 bg-white"
               />
@@ -97,7 +99,7 @@ export default function SignUp() {
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="signup-email">
-                Email Address
+                {t('auth.email', 'Email Address')}
               </label>
               <input
                 id="signup-email"
@@ -105,7 +107,7 @@ export default function SignUp() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="you@example.com"
+                placeholder={t('auth.emailPlaceholder', 'you@example.com')}
                 autoComplete="email"
                 className="w-full text-sm border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-400 text-slate-700 bg-white"
               />
@@ -113,7 +115,7 @@ export default function SignUp() {
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="signup-password">
-                Password
+                {t('auth.password', 'Password')}
               </label>
               <div className="relative">
                 <input
@@ -122,7 +124,7 @@ export default function SignUp() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="Min. 6 characters"
+                  placeholder={t('auth.passwordMinPlaceholder', 'Min. 6 characters')}
                   autoComplete="new-password"
                   className="w-full text-sm border border-slate-200 rounded-xl px-4 py-3 pr-11 focus:outline-none focus:ring-2 focus:ring-primary-400 text-slate-700 bg-white"
                 />
@@ -130,7 +132,7 @@ export default function SignUp() {
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? t('auth.hidePassword', 'Hide password') : t('auth.showPassword', 'Show password')}
                 >
                   {showPassword ? (
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -166,7 +168,7 @@ export default function SignUp() {
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="signup-confirm-password">
-                Confirm Password
+                {t('auth.confirmPassword', 'Confirm Password')}
               </label>
               <div className="relative">
                 <input
@@ -175,7 +177,7 @@ export default function SignUp() {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  placeholder="Re-enter your password"
+                  placeholder={t('auth.confirmPasswordPlaceholder', 'Re-enter your password')}
                   autoComplete="new-password"
                   className={`w-full text-sm border rounded-xl px-4 py-3 pr-11 focus:outline-none focus:ring-2 focus:ring-primary-400 text-slate-700 bg-white ${
                     formData.confirmPassword && formData.password !== formData.confirmPassword
@@ -187,7 +189,7 @@ export default function SignUp() {
                   type="button"
                   onClick={() => setShowConfirm((v) => !v)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                  aria-label={showConfirm ? 'Hide confirm password' : 'Show confirm password'}
+                  aria-label={showConfirm ? t('auth.hideConfirmPassword', 'Hide confirm password') : t('auth.showConfirmPassword', 'Show confirm password')}
                 >
                   {showConfirm ? (
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -202,13 +204,13 @@ export default function SignUp() {
                 </button>
               </div>
               {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                <p className="text-xs text-red-500 mt-1">Passwords do not match</p>
+                <p className="text-xs text-red-500 mt-1">{t('auth.passwordsDoNotMatch', 'Passwords do not match')}</p>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                I am a…
+                {t('auth.roleSelection', 'I am a…')}
               </label>
               <div className="grid grid-cols-1 gap-2">
                 {ROLES.map((r) => (
@@ -233,9 +235,9 @@ export default function SignUp() {
                     <span className="text-xl leading-none">{r.icon}</span>
                     <div className="flex-1 min-w-0">
                       <span className={`block text-sm font-semibold ${formData.role === r.value ? 'text-primary-700' : 'text-slate-700'}`}>
-                        {r.label}
+                        {t(r.labelKey, '')}
                       </span>
-                      <span className="block text-xs text-slate-500 leading-snug mt-0.5">{r.desc}</span>
+                      <span className="block text-xs text-slate-500 leading-snug mt-0.5">{t(r.descKey, '')}</span>
                     </div>
                     {formData.role === r.value && (
                       <svg className="w-5 h-5 text-primary-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -257,15 +259,15 @@ export default function SignUp() {
               disabled={loading}
               className="w-full bg-primary-600 text-white font-semibold py-3.5 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-60 text-sm mt-2"
             >
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? t('auth.creatingAccount', 'Creating Account...') : t('auth.createAccount', 'Create Account')}
             </button>
           </form>
         </div>
 
         <p className="text-center text-sm text-slate-500 mt-5">
-          Already have an account?{' '}
+          {t('auth.hasAccount', 'Already have an account?')}{' '}
           <Link to="/login" className="text-primary-600 font-semibold hover:underline">
-            Sign in
+            {t('auth.signIn', 'Sign in')}
           </Link>
         </p>
       </div>

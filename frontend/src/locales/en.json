@@ -9,7 +9,9 @@
     "signup": "Sign Up",
     "logout": "Logout",
     "governmentHealthcare": "Government Healthcare",
-    "language": "Language"
+    "language": "Language",
+    "userMenu": "User menu",
+    "toggleNav": "Toggle navigation menu"
   },
   "search": {
     "placeholder": "Search for hospital, PHC, CHC, doctor, medicine...",
@@ -159,6 +161,8 @@
     "upToDateDesc": "Every facility shows a \"Last Verified\" date. Information is updated by authorised healthcare workers. You can also report incorrect information to help your community.",
     "reportAnIssue": "Report an Issue",
     "emergencyPrefix": "Medical Emergency?",
+    "emergencyCall": "Call",
+    "immediately": "immediately.",
     "emergencyAmbulance": "Call 108 (Ambulance) or 102 (Maternity) immediately."
   },
   "auth": {
@@ -192,7 +196,11 @@
     "passwordsDoNotMatch": "Passwords do not match.",
     "selectRole": "Please select your role.",
     "createAccountFailed": "Failed to create account. Please try again.",
-    "invalidCredentials": "Invalid email or password. Please try again."
+    "invalidCredentials": "Invalid email or password. Please try again.",
+    "hidePassword": "Hide password",
+    "showPassword": "Show password",
+    "hideConfirmPassword": "Hide confirm password",
+    "showConfirmPassword": "Show confirm password"
   },
   "details": {
     "notFound": "Facility not found",
@@ -241,6 +249,7 @@
     "tableVerification": "Verification",
     "tableDetails": "Details →",
     "close": "✕ Close",
+    "locationError": "Could not get your location. Please allow location access.",
     "bedsCount": "{{count}} beds",
     "doctorsCount_one": "{{count}} doctor",
     "doctorsCount_other": "{{count}} doctors"
@@ -316,6 +325,11 @@
     "ambulanceName": "National Ambulance Service",
     "maternityName": "Janani Express (Maternity)",
     "copyright": "© 2026 RuralCare. Information verified by authorised healthcare workers.",
-    "disclaimer": "Data on this platform is for guidance only. Always consult a qualified doctor."
+    "disclaimer": "Data on this platform is for guidance only. Always consult a qualified doctor.",
+    "linkHome": "Home",
+    "linkFindHealthcare": "Find Healthcare",
+    "linkMap": "Healthcare Map",
+    "linkAssistant": "AI Assistant",
+    "linkReport": "Report an Issue"
   }
 }

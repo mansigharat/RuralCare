@@ -1,15 +1,24 @@
+import { useTranslation } from 'react-i18next'
 import { VERIFICATION_STATUS } from '../data/mockFacilities'
+
+const STATUS_KEY_MAP = {
+  [VERIFICATION_STATUS.VERIFIED]: 'verification.verifiedRecently',
+  [VERIFICATION_STATUS.NEEDS_VERIFICATION]: 'verification.needsVerification',
+  [VERIFICATION_STATUS.OUTDATED]: 'verification.outdated',
+}
 
 /**
  * Displays the verification status badge for a facility.
  * @param {{ status: string, size?: 'sm' | 'md' }} props
  */
 export default function VerificationBadge({ status, size = 'sm' }) {
+  const { t } = useTranslation()
   const isVerified = status === VERIFICATION_STATUS.VERIFIED
   const isOutdated = status === VERIFICATION_STATUS.OUTDATED
   const isNeedsVerification = status === VERIFICATION_STATUS.NEEDS_VERIFICATION
 
   const sizeClass = size === 'md' ? 'text-sm px-3 py-1.5' : 'text-xs px-2 py-1'
+  const label = t(STATUS_KEY_MAP[status] || 'verification.needsVerification', status)
 
   if (isVerified) {
     return (
@@ -17,7 +26,7 @@ export default function VerificationBadge({ status, size = 'sm' }) {
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        {status}
+        {label}
       </span>
     )
   }
@@ -28,7 +37,7 @@ export default function VerificationBadge({ status, size = 'sm' }) {
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.072 16.5c-.77.833.192 2.5 1.732 2.5z" />
         </svg>
-        {status}
+        {label}
       </span>
     )
   }
@@ -38,7 +47,7 @@ export default function VerificationBadge({ status, size = 'sm' }) {
       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.072 16.5c-.77.833.192 2.5 1.732 2.5z" />
       </svg>
-      {status}
+      {label}
     </span>
   )
 }
