@@ -1,13 +1,20 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 
 const navLinks = [
-  { to: '/', label: 'Home' },
-  { to: '/facilities', label: 'Find Healthcare' },
-  { to: '/map', label: 'Map' },
-  { to: '/assistant', label: 'AI Assistant' },
-  { to: '/report', label: 'Report Issue' },
+  { to: '/', labelKey: 'navbar.home', defaultLabel: 'Home' },
+  { to: '/facilities', labelKey: 'navbar.findHealthcare', defaultLabel: 'Find Healthcare' },
+  { to: '/map', labelKey: 'navbar.map', defaultLabel: 'Map' },
+  { to: '/assistant', labelKey: 'navbar.assistant', defaultLabel: 'AI Assistant' },
+  { to: '/report', labelKey: 'navbar.reportIssue', defaultLabel: 'Report Issue' },
+]
+
+const LANGUAGES = [
+  { code: 'en', label: 'English' },
+  { code: 'hi', label: 'हिंदी' },
+  { code: 'mr', label: 'मराठी' },
 ]
 
 const ROLE_LABELS = {
@@ -17,10 +24,17 @@ const ROLE_LABELS = {
 }
 
 export default function Navbar() {
+  const { t, i18n } = useTranslation()
   const [menuOpen, setMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const { user, logOut, isAuthenticated } = useAuth()
   const navigate = useNavigate()
+
+  const currentLang = i18n.language ? i18n.language.split('-')[0] : 'en'
+
+  const handleLanguageChange = (code) => {
+    i18n.changeLanguage(code)
+  }
 
   const handleLogout = () => {
     logOut()
@@ -49,19 +63,44 @@ export default function Navbar() {
             </div>
             <div>
               <span className="text-lg font-bold text-primary-700 leading-none">RuralCare</span>
-              <p className="text-[10px] text-slate-400 font-normal leading-none mt-0.5">Government Healthcare</p>
+              <p className="text-[10px] text-slate-400 font-normal leading-none mt-0.5">
+                {t('navbar.governmentHealthcare', 'Government Healthcare')}
+              </p>
             </div>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => (
               <NavLink key={link.to} to={link.to} className={linkClass} end={link.to === '/'}>
-                {link.label}
+                {t(link.labelKey, link.defaultLabel)}
               </NavLink>
             ))}
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
+            {/* Language Switcher */}
+            <div
+              className="flex items-center text-xs font-medium border border-slate-200 rounded-lg p-0.5 bg-slate-50"
+              role="group"
+              aria-label={t('navbar.language', 'Language')}
+            >
+              {LANGUAGES.map((lang) => (
+                <button
+                  key={lang.code}
+                  type="button"
+                  onClick={() => handleLanguageChange(lang.code)}
+                  className={`px-2 py-1 rounded transition-colors ${
+                    currentLang === lang.code
+                      ? 'bg-white text-primary-700 font-semibold shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                  aria-pressed={currentLang === lang.code}
+                >
+                  {lang.label}
+                </button>
+              ))}
+            </div>
+
             {isAuthenticated ? (
               <div className="relative">
                 <button
@@ -71,7 +110,6 @@ export default function Navbar() {
                   aria-label="User menu"
                   aria-expanded={userMenuOpen}
                 >
-       
                   <div className="w-7 h-7 rounded-full bg-primary-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                     {avatar}
                   </div>
@@ -100,7 +138,7 @@ export default function Navbar() {
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                         </svg>
-                        Logout
+                        {t('navbar.logout', 'Logout')}
                       </button>
                     </div>
                   </>
@@ -112,13 +150,13 @@ export default function Navbar() {
                   to="/login"
                   className="text-sm font-medium text-slate-600 hover:text-primary-600 transition-colors"
                 >
-                  Login
+                  {t('navbar.login', 'Login')}
                 </Link>
                 <Link
                   to="/signup"
                   className="bg-primary-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
                 >
-                  Sign Up
+                  {t('navbar.signup', 'Sign Up')}
                 </Link>
               </>
             )}
@@ -146,6 +184,27 @@ export default function Navbar() {
       {menuOpen && (
         <div className="md:hidden border-t border-slate-200 bg-white">
           <nav className="px-4 py-3 space-y-1">
+            {/* Mobile Language Switcher */}
+            <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+              <span className="text-xs font-medium text-slate-500">{t('navbar.language', 'Language')}:</span>
+              <div className="flex items-center gap-1">
+                {LANGUAGES.map((lang) => (
+                  <button
+                    key={lang.code}
+                    type="button"
+                    onClick={() => handleLanguageChange(lang.code)}
+                    className={`px-2 py-1 text-xs rounded transition-colors ${
+                      currentLang === lang.code
+                        ? 'bg-primary-100 text-primary-800 font-semibold'
+                        : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    {lang.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {navLinks.map((link) => (
               <NavLink
                 key={link.to}
@@ -160,14 +219,13 @@ export default function Navbar() {
                   }`
                 }
               >
-                {link.label}
+                {t(link.labelKey, link.defaultLabel)}
               </NavLink>
             ))}
 
             <div className="pt-2 border-t border-slate-100 mt-2">
               {isAuthenticated ? (
                 <>
-    
                   <div className="px-3 py-2.5 flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
                       {avatar}
@@ -184,7 +242,7 @@ export default function Navbar() {
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
-                    Logout
+                    {t('navbar.logout', 'Logout')}
                   </button>
                 </>
               ) : (
@@ -194,14 +252,14 @@ export default function Navbar() {
                     onClick={() => setMenuOpen(false)}
                     className="block px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
                   >
-                    Login
+                    {t('navbar.login', 'Login')}
                   </Link>
                   <Link
                     to="/signup"
                     onClick={() => setMenuOpen(false)}
                     className="block px-3 py-2.5 rounded-lg text-sm font-medium text-center bg-primary-600 text-white hover:bg-primary-700"
                   >
-                    Sign Up
+                    {t('navbar.signup', 'Sign Up')}
                   </Link>
                 </div>
               )}
@@ -212,3 +270,4 @@ export default function Navbar() {
     </header>
   )
 }
+

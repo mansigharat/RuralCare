@@ -45,12 +45,16 @@ def register(body: UserRegister, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 def login(body: UserLogin, db: Session = Depends(get_db)):
-    """Authenticate with phone + password and return a JWT."""
-    user = db.query(User).filter(User.phone == body.phone).first()
+    """Authenticate with phone or email + password and return a JWT."""
+    user = (
+        db.query(User)
+        .filter((User.phone == body.phone) | (User.email == body.phone))
+        .first()
+    )
     if not user or not verify_password(body.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid phone number or password",
+            detail="Invalid email/phone or password",
         )
 
     token = create_access_token(

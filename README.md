@@ -1,155 +1,88 @@
-# RuralCare 🏥
+# 🏥 RuralCare - Healthcare Access Platform for Rural India
 
-## Rural Healthcare Access Platform
-
-RuralCare is a web-based platform designed to help rural citizens find nearby healthcare facilities and check healthcare service availability before travelling.
-
-The platform connects **citizens, healthcare workers, and government authorities** to improve healthcare accessibility and keep facility information updated.
+A full-stack web application designed to help rural citizens find nearby primary health centres, community health centres, and district hospitals, view live doctor availability, track essential medicine stock, and report facility issues.
 
 ---
 
-## 🎯 Problem
+## 📋 Prerequisites (What you need installed)
 
-Rural citizens face several challenges when accessing healthcare:
+Before doing anything, ensure these three programs are installed on your computer:
 
-- Healthcare facilities may be located far away.
-- Facility information can be incomplete or outdated.
-- Citizens may not know which facility provides the required service.
-- Information about doctors, medicines, and services may change frequently.
-- Government authorities may not have a unified view of healthcare accessibility gaps.
-
-### Core Problem
-
-**Citizens may travel long distances without knowing whether the required healthcare service is available.**
+1. **[Node.js](https://nodejs.org/)** (v18 or higher recommended)
+2. **[Python](https://python.org/)** (v3.10 to v3.12+ recommended) — *make sure to check "Add Python to PATH" during installation*
+3. **[PostgreSQL](https://www.postgresql.org/download/)** — *recommended: set `postgres` or `admin` as the password during installation and keep port as `5432`*
 
 ---
 
-## 💡 Proposed Solution
+## 🛠️ Step-by-Step Setup Guide (For Teammates / Judges)
 
-RuralCare provides a single platform where citizens can:
+### 1. Set up the Backend Database
 
-- Find nearby PHCs, CHCs, and hospitals.
-- Search healthcare facilities based on location and services.
-- Check service availability before visiting.
-- View facilities on an interactive map.
-- Get AI-assisted healthcare navigation.
-- Report incorrect or missing facility information.
+By default, Git ignores `.env` files for security. You can generate or configure it in one simple step:
 
-Healthcare workers can update facility information, while government authorities can monitor healthcare accessibility gaps.
+- Open a terminal in the `backend/` folder.
+- Run the automatic database creator script:
+  ```bash
+  python create_db.py
+  ```
+  *(This will attempt common passwords, create the `ruralcare` database in PostgreSQL, and generate a working `.env` file automatically).*
 
----
-
-## ✨ Key Features
-
-### 📍 Nearby Facility Finder
-
-Find nearby:
-
-- Primary Health Centres (PHCs)
-- Community Health Centres (CHCs)
-- Hospitals
+- **(Manual Alternative)**:
+  - Copy `backend/.env.example` to `backend/.env`.
+  - Ensure the database URL matches your PostgreSQL credentials:
+    ```env
+    DATABASE_URL=postgresql://postgres:your_password@localhost:5432/ruralcare
+    SECRET_KEY=ruralcare-sih-hackathon-secret-key-2024
+    ALGORITHM=HS256
+    ACCESS_TOKEN_EXPIRE_MINUTES=60
+    ```
 
 ---
 
-### 🗺️ Smart Healthcare Map
+### 2. Seed the Database with Demo Data
 
-View healthcare facilities on an interactive map based on:
+In the project root folder:
 
-- Location
-- Distance
-- Available services
+- **Option A (Easy)**: Double-click **`seed-database.bat`**
+- **Option B (Terminal)**:
+  ```bash
+  cd backend
+  pip install -r requirements.txt
+  python seed.py
+  ```
 
----
-
-### 🏥 Service Availability
-
-Citizens can check information such as:
-
-- Available doctors
-- Healthcare services
-- Medicines
-- Facility status
-- Contact information
+This creates all database tables and seeds:
+- **15 realistic healthcare facilities** across Pune, Nashik, and Ahmednagar
+- Doctors and OPD schedules
+- Essential Jan Aushadhi medicines & stock status
+- Demo users and sample citizen issue reports
 
 ---
 
-### 🤖 AI Healthcare Assistant
+### 3. Run the Application
 
-The AI assistant helps citizens:
+Once the one-time database setup above is done, starting the app takes just two clicks:
 
-- Understand their healthcare requirement.
-- Find a suitable healthcare facility.
-- Get general healthcare navigation guidance.
+1. **Start the Backend**:
+   - Double-click **`start-backend.bat`** *(leaves the terminal window open)*
+   - API will run at: **`http://localhost:8000`**
+   - Interactive Swagger API docs: **`http://localhost:8000/docs`**
 
-> **Note:** The AI assistant is for navigation and general guidance only. It does not provide medical diagnosis.
+2. **Start the Frontend**:
+   - Double-click **`start-frontend.bat`** *(leaves the terminal window open)*
+   - Frontend web application will open at: **`http://localhost:5173`**
 
----
-
-### ✅ Facility Verification
-
-Facility information can have a verification status such as:
-
-- **Verified Recently**
-- **Needs Verification**
-- **Information Outdated**
-
-The system can also display the **last verified date**.
+3. Open your browser and navigate to:
+   👉 **`http://localhost:5173`**
 
 ---
 
-### 📝 Citizen Reporting
+## 🔑 Demo Login Accounts
 
-Citizens can report:
+You can test different user roles using the seeded accounts:
 
-- Incorrect facility information
-- Missing facilities
-- Unavailable services
-- Incorrect medicine availability
-- Other facility-related issues
-
----
-
-### 👨‍⚕️ Healthcare Worker Updates
-
-Authorized healthcare workers can update facility information when:
-
-- Services change
-- Doctors change
-- Medicines become unavailable
-- Facility information changes
-
----
-
-### 🏛️ Government Dashboard
-
-Government authorities can view:
-
-- Healthcare facility information
-- Citizen reports
-- Frequently unavailable services
-- Healthcare accessibility gaps
-
----
-
-## 🔄 How RuralCare Works
-
-```text
-Citizen
-   ↓
-RuralCare Web Application
-   ↓
-Search / Location / Healthcare Requirement
-   ↓
-Find Suitable Healthcare Facility
-   ↓
-Check Verified Information
-   ↓
-Facility Recommendation
-   ↓
-Navigation
-   ↓
-Citizen Feedback / Report
-   ↓
-Healthcare Worker Verification & Updates
-   ↓
-Government Healthcare Gap Insights
+| Role | Phone Number | Password | Features Accessible |
+| :--- | :--- | :--- | :--- |
+| **Admin** | `9000000001` | `admin123` | Review & verify citizen reports, manage facilities |
+| **Staff** | `9000000002` | `staff123` | Update doctor duty schedules and medicine inventory |
+| **Citizen** | `9000000003` | `citizen123` | Search facilities, filter by service/distance, report issues |

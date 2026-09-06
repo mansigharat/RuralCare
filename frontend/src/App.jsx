@@ -13,6 +13,7 @@ import Login from './pages/Login'
 import SignUp from './pages/SignUp'
 import NotFound from './pages/NotFound'
 import ScrollToTop from './components/ScrollToTop'
+import OfflineBanner from './components/OfflineBanner'
 
 function App() {
   return (
@@ -20,8 +21,10 @@ function App() {
       <AuthProvider>
         <ScrollToTop />
         <div className="flex flex-col min-h-screen">
+          <OfflineBanner />
           <Navbar />
           <main className="flex-1">
+
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />

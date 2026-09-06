@@ -27,17 +27,23 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => readSession())
 
-  const signUp = useCallback(async ({ name, email, password, role }) => {
-    // Note: The UI calls the phone number field "email" for now. 
-    // We send it to the backend as phone.
+  const signUp = useCallback(async ({ name, email, phone, password, role }) => {
+    let backendRole = 'citizen'
+    if (role === 'healthcare_worker' || role === 'staff') backendRole = 'staff'
+    if (role === 'government' || role === 'admin') backendRole = 'admin'
+
+    const userIdentifier = phone || email
+
     const res = await register({
-      phone: email, 
+      name: name?.trim() || 'User',
+      phone: userIdentifier,
+      email: email && email.includes('@') ? email : null,
       password,
-      role: role || 'citizen',
+      role: backendRole,
     })
     
     if (res.success) {
-      const sessionUser = { token: res.token, phone: email, role: res.role }
+      const sessionUser = { token: res.token, phone: userIdentifier, role: res.role, name: name?.trim() }
       writeSession(sessionUser)
       setUser(sessionUser)
       return { success: true }

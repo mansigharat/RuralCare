@@ -10,7 +10,12 @@
  * ──────────────────────────────────────────────────────────────
  */
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+const API_URL =
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) ||
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL) ||
+  'http://localhost:8000'
+const BASE_URL = API_URL
+
 
 // ─── Token helpers ───────────────────────────────────────────────
 
@@ -36,7 +41,20 @@ async function apiFetch(path, options = {}) {
     let message = `API error ${res.status}`
     try {
       const body = await res.json()
-      message = body.detail || message
+      if (typeof body.detail === 'string') {
+        message = body.detail
+      } else if (Array.isArray(body.detail)) {
+        message = body.detail
+          .map((item) => {
+            const field = Array.isArray(item.loc) ? item.loc[item.loc.length - 1] : ''
+            return field ? `${field}: ${item.msg}` : item.msg || JSON.stringify(item)
+          })
+          .join(', ')
+      } else if (body.detail) {
+        message = JSON.stringify(body.detail)
+      } else if (body.message) {
+        message = body.message
+      }
     } catch {}
     throw new Error(message)
   }
@@ -47,52 +65,76 @@ async function apiFetch(path, options = {}) {
 }
 
 // ─── Field-mapping adapters ──────────────────────────────────────
-// Backend uses snake_case and different field names from the mock.
-// These functions normalise API responses to the shape components expect.
+// Translates backend snake_case and enum values to the camelCase shape
+// consumed by the existing UI components without redesigning cards.
 
-function mapStatus(status) {
+export function mapStatus(status) {
   // Backend: "Fresh" | "Needs Verification" | "Outdated"
-  // Frontend (mock): "Verified Recently" | "Needs Verification" | "Information Outdated"
-  if (status === 'Fresh') return 'Verified Recently'
-  if (status === 'Outdated') return 'Information Outdated'
-  return status // "Needs Verification" matches exactly
+  // Frontend: "Verified Recently" | "Needs Verification" | "Information Outdated"
+  if (status === 'Fresh' || status === 'fresh') return 'Verified Recently'
+  if (status === 'Outdated' || status === 'outdated') return 'Information Outdated'
+  return status || 'Needs Verification'
 }
 
-function adaptFacility(f) {
+/**
+ * Normalizes an API facility object into the shape required by FacilityCard & details.
+ * @param {Object} f - Raw facility object from backend or mock
+ */
+export function normalizeFacility(f) {
+  if (!f) return null
+
+  const services = (f.services || []).map((s) => (typeof s === 'string' ? s : s?.name || '')).filter(Boolean)
+  const doctors = (f.doctors || []).map((d) => ({
+    id: d.id,
+    name: d.name,
+    specialisation: d.specialization || d.specialisation || 'General Physician',
+    available: d.available !== undefined ? d.available : true,
+    available_days: d.available_days,
+    available_hours: d.available_hours,
+  }))
+  const medicines = (f.medicines || []).map((m) => ({
+    id: m.id,
+    name: m.name,
+    available: m.in_stock !== undefined ? m.in_stock : (m.available !== undefined ? m.available : true),
+  }))
+
+  const distanceVal = f.distance_km != null
+    ? Number(f.distance_km).toFixed(1)
+    : (f.distance != null ? f.distance : null)
+
   return {
-    id: f.id,
-    name: f.name,
-    type: f.type,
-    address: f.address || `${f.village}, ${f.district}, ${f.state}`,
-    village: f.village,
-    district: f.district,
-    state: f.state,
+    id: String(f.id),
+    name: f.name || '',
+    type: f.type || 'PHC',
+    address: f.address || [f.village, f.district, f.state].filter(Boolean).join(', ') || 'Address not specified',
+    village: f.village || '',
+    district: f.district || '',
+    state: f.state || 'Maharashtra',
     latitude: f.latitude,
     longitude: f.longitude,
     phone: f.phone || '',
-    email: '',
-    workingStatus: 'Open',       // backend doesn't track open/closed yet
-    workingHours: '',
-    verificationStatus: mapStatus(f.status),
-    distance: f.distance_km ?? null,
-    bedCount: f.bed_count || 0,
-    lastVerified: f.last_verified || null,
-    basicFacilities: [], // Fallback since backend doesn't have this array yet
-    // nested arrays — present on detail endpoint, empty on list
-    services: (f.services || []).map((s) => s.name || s),
-    doctors: (f.doctors || []).map((d) => ({
-      name: d.name,
-      specialisation: d.specialization,
-      available: true,
-      available_days: d.available_days,
-      available_hours: d.available_hours,
-    })),
-    medicines: (f.medicines || []).map((m) => ({
-      name: m.name,
-      available: m.in_stock,
-    })),
+    email: f.email || '',
+    workingStatus: f.workingStatus || 'Open',
+    workingHours: f.workingHours || (f.type === 'Hospital' || f.type === 'CHC' ? '24 Hours / 7 Days' : '8:00 AM – 2:00 PM'),
+    verificationStatus: mapStatus(f.status || f.verificationStatus),
+    distance: distanceVal,
+    bedCount: f.bed_count || f.bedCount || 0,
+    lastVerified: f.last_verified || f.lastVerified || null,
+    basicFacilities: f.basicFacilities || ['Drinking Water', 'Waiting Area'],
+    services,
+    doctors,
+    medicines,
+    doctorsAvailable: f.doctorsAvailable !== undefined
+      ? f.doctorsAvailable
+      : (doctors.length > 0 ? doctors.some((d) => d.available) : true),
+    medicinesAvailable: f.medicinesAvailable !== undefined
+      ? f.medicinesAvailable
+      : (medicines.length > 0 ? medicines.some((m) => m.available) : true),
   }
 }
+
+export const adaptFacility = normalizeFacility
+
 
 // ─── Facilities ──────────────────────────────────────────────────
 
