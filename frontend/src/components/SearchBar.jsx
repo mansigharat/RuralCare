@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 /**
  * @param {{ onSearch: (query: string) => void, placeholder?: string, className?: string }} props
  */
-export default function SearchBar({ onSearch, placeholder = 'Search...', className = '', initialValue = '' }) {
+export default function SearchBar({ onSearch, placeholder, className = '', initialValue = '' }) {
+  const { t } = useTranslation()
   const [query, setQuery] = useState(initialValue)
 
   const handleSubmit = (e) => {

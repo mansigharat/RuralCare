@@ -39,5 +39,36 @@ ACCESS_TOKEN_EXPIRE_MINUTES=60
         print(f"Tried password={repr(pwd)}: failed")
 
 if not connected:
-    print("\nCould not connect with any common password.")
-    print("Please tell me: what password did you set when installing PostgreSQL?")
+    print("\nNone of the common default passwords matched.")
+    user_pwd = input("Please enter your PostgreSQL 'postgres' user password: ").strip()
+    try:
+        conn = psycopg2.connect(
+            host='localhost',
+            port=5432,
+            user='postgres',
+            password=user_pwd,
+            dbname='postgres'
+        )
+        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cur = conn.cursor()
+        cur.execute("SELECT 1 FROM pg_database WHERE datname='ruralcare'")
+        exists = cur.fetchone()
+        if not exists:
+            cur.execute("CREATE DATABASE ruralcare")
+            print(f"SUCCESS: Database 'ruralcare' created!")
+        else:
+            print(f"Database 'ruralcare' already exists. Good to go!")
+        conn.close()
+        connected = True
+
+        env_content = f"""DATABASE_URL=postgresql://postgres:{user_pwd}@localhost:5432/ruralcare
+SECRET_KEY=ruralcare-sih-hackathon-secret-key-2024
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+"""
+        with open('.env', 'w') as f:
+            f.write(env_content)
+        print("Updated .env with your password successfully!")
+    except Exception as e:
+        print(f"\nFailed to connect with provided password: {e}")
+        print("Please check your password or reset it in PostgreSQL.")
