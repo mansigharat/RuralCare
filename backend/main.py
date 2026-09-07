@@ -38,7 +38,11 @@ app.add_middleware(
 
 # ── Auto-create tables (dev convenience; use Alembic in production) ───────────
 
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as exc:
+    import logging
+    logging.getLogger(__name__).warning("Database connection failed during auto-create tables: %s", exc)
 
 # ── Routers ───────────────────────────────────────────────────────────────────
 

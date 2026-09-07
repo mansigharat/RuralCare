@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
-from typing import Optional, List, Any
+from typing import Optional, List
 from sqlalchemy.orm import Session
 
 from database.connection import get_db
+from schemas.facility import FacilityListOut
 from services.ai_service import process_query
 from services.facility_service import get_facilities
 
@@ -13,21 +14,10 @@ router = APIRouter(prefix="/ai", tags=["AI"])
 # ── Request / Response schemas ──────────────────────────────────────────────
 
 class AIQueryRequest(BaseModel):
-    message: str = Field(..., min_length=1, description="User's plain-language query")
-
-
-class FacilityResult(BaseModel):
-    id: Any
-    name: str
-    type: str
-    village: str
-    district: str
-    state: str
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-    phone: Optional[str] = None
-    status: Optional[str] = None
-    distance_km: Optional[float] = None
+    # Primary field per specification
+    message: Optional[str] = Field(None, description="User's plain-language query")
+    # Optional backward-compatibility field for existing frontend callers
+    query: Optional[str] = Field(None, description="Fallback query string")
 
 
 class AIQueryResponse(BaseModel):
@@ -37,7 +27,7 @@ class AIQueryResponse(BaseModel):
     diagnosis_request: bool = False
     search_query: Optional[str] = None
     response: Optional[str] = None
-    facilities: Optional[List[FacilityResult]] = None
+    facilities: Optional[List[FacilityListOut]] = None
 
 
 # ── Endpoint ─────────────────────────────────────────────────────────────────
@@ -45,34 +35,34 @@ class AIQueryResponse(BaseModel):
 @router.post("/query", response_model=AIQueryResponse)
 def ai_query(body: AIQueryRequest, db: Session = Depends(get_db)):
     """
-    AI Navigation Assistant endpoint.
+    Healthcare Navigation Assistant endpoint.
 
-    Accepts a plain-language message in English, Hindi, or Marathi and
-    returns a structured facility-search intent.  If the message resembles
-    a diagnosis request, a safety response is returned instead.
+    Understands a citizen's plain-language need (English/Hindi/Marathi)
+    and converts it into a structured facility search.
+    It NEVER diagnoses medical conditions or prescribes treatments.
 
-    The structured search_query is connected to the EXISTING /facilities
-    search logic (services.facility_service.get_facilities) — no facility
-    search code is duplicated.
+    Connects directly to the existing facility search logic in
+    services.facility_service.get_facilities — reusing existing code.
     """
-    # Process the message through the Gemini service
-    result = process_query(body.message)
+    user_text = body.message if body.message is not None else body.query
 
-    # If we have a search_query, run it through the existing facility search
-    facilities: Optional[List[dict]] = None
-    if result.get("search_query") and result.get("intent") == "facility_search":
-        try:
-            facilities = get_facilities(
-                db,
-                service_type=result["search_query"],
-            )
-        except Exception:
-            # Don't let facility search failures break the AI response
-            facilities = None
+    # Process through the AI service layer (Gemini + Safety Pre-checks)
+    result = process_query(user_text)
+
+    # Connect structured output to existing /facilities search logic
+    facilities = None
+    if result.get("intent") == "facility_search":
+        search_term = result.get("search_query") or result.get("healthcare_need")
+        if search_term and search_term != "general":
+            try:
+                facilities = get_facilities(db, service_type=search_term)
+            except Exception:
+                # Database error should not crash the AI navigation response
+                facilities = None
 
     return AIQueryResponse(
-        language=result["language"],
-        intent=result["intent"],
+        language=result.get("language", "en"),
+        intent=result.get("intent", "facility_search"),
         healthcare_need=result.get("healthcare_need"),
         diagnosis_request=result.get("diagnosis_request", False),
         search_query=result.get("search_query"),

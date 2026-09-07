@@ -37,11 +37,33 @@ def get_facilities(
 
     # Filter by service_type if provided (requires a join)
     if service_type:
+        from sqlalchemy import or_
+        import re
+
+        stop_words = {"care", "hospital", "clinic", "center", "centre", "for", "and", "the", "in", "near"}
+        clean_words = [w for w in re.split(r"[\s_,]+", service_type) if w.lower() not in stop_words and len(w) > 2]
+
+        conditions = [Service.name.ilike(f"%{service_type}%")]
+        for w in clean_words:
+            conditions.append(Service.name.ilike(f"%{w}%"))
+            low = w.lower()
+            if low in ("pregnancy", "pregnant", "maternal"):
+                conditions.append(Service.name.ilike("%maternity%"))
+            elif low in ("child", "childcare", "infant"):
+                conditions.append(Service.name.ilike("%paediatric%"))
+                conditions.append(Service.name.ilike("%pediatric%"))
+                conditions.append(Service.name.ilike("%immunisation%"))
+            elif low in ("vaccine", "vaccination"):
+                conditions.append(Service.name.ilike("%immunisation%"))
+            elif low in ("checkup", "general"):
+                conditions.append(Service.name.ilike("%opd%"))
+
         service_facility_ids = {
             row.facility_id
-            for row in db.query(Service).filter(Service.name.ilike(f"%{service_type}%")).all()
+            for row in db.query(Service).filter(or_(*conditions)).all()
         }
-        facilities = [f for f in facilities if f.id in service_facility_ids]
+        if service_facility_ids:
+            facilities = [f for f in facilities if f.id in service_facility_ids]
 
     result = []
     for facility in facilities:
