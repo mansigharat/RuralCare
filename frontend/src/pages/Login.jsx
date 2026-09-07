@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
+  const { t } = useTranslation()
   const { logIn } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -22,7 +24,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!formData.email || !formData.password) {
-      setError('Please enter your email and password.')
+      setError(t('auth.enterEmailPass', 'Please enter your email and password.'))
       return
     }
     setLoading(true)
@@ -30,7 +32,7 @@ export default function Login() {
       await logIn({ email: formData.email, password: formData.password })
       navigate(from, { replace: true })
     } catch (err) {
-      setError(err.message || 'Invalid email or password. Please try again.')
+      setError(err.message || t('auth.invalidCredentials', 'Invalid email or password. Please try again.'))
     } finally {
       setLoading(false)
     }
@@ -45,15 +47,15 @@ export default function Login() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">Welcome back</h1>
-          <p className="text-slate-500 text-sm mt-1">Sign in to your RuralCare account</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('auth.welcomeBack', 'Welcome back')}</h1>
+          <p className="text-slate-500 text-sm mt-1">{t('auth.signInSubtitle', 'Sign in to your RuralCare account')}</p>
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-7">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="login-email">
-                Email Address
+                {t('auth.email', 'Email Address')}
               </label>
               <input
                 id="login-email"
@@ -61,7 +63,7 @@ export default function Login() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="you@example.com"
+                placeholder={t('auth.emailPlaceholder', 'you@example.com')}
                 autoComplete="email"
                 className="w-full text-sm border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-400 text-slate-700 bg-white"
               />
@@ -69,7 +71,7 @@ export default function Login() {
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="login-password">
-                Password
+                {t('auth.password', 'Password')}
               </label>
               <div className="relative">
                 <input
@@ -78,7 +80,7 @@ export default function Login() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="••••••••"
+                  placeholder={t('auth.passwordPlaceholder', '••••••••')}
                   autoComplete="current-password"
                   className="w-full text-sm border border-slate-200 rounded-xl px-4 py-3 pr-11 focus:outline-none focus:ring-2 focus:ring-primary-400 text-slate-700 bg-white"
                 />
@@ -86,7 +88,7 @@ export default function Login() {
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? t('auth.hidePassword', 'Hide password') : t('auth.showPassword', 'Show password')}
                 >
                   {showPassword ? (
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,13 +114,13 @@ export default function Login() {
               disabled={loading}
               className="w-full bg-primary-600 text-white font-semibold py-3.5 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-60 text-sm mt-2"
             >
-              {loading ? 'Signing In...' : 'Sign In'}
+              {loading ? t('auth.signingIn', 'Signing In...') : t('auth.signIn', 'Sign In')}
             </button>
           </form>
 
           <div className="my-5 flex items-center gap-3">
             <div className="flex-1 h-px bg-slate-200"></div>
-            <span className="text-xs text-slate-400">or</span>
+            <span className="text-xs text-slate-400">{t('auth.or', 'or')}</span>
             <div className="flex-1 h-px bg-slate-200"></div>
           </div>
 
@@ -126,14 +128,14 @@ export default function Login() {
             to="/facilities"
             className="block w-full text-center border-2 border-slate-200 text-slate-700 font-semibold py-3 rounded-xl hover:border-primary-300 hover:text-primary-600 transition-colors text-sm"
           >
-            Continue as Guest (no login required)
+            {t('auth.guestContinue', 'Continue as Guest (no login required)')}
           </Link>
         </div>
 
         <p className="text-center text-sm text-slate-500 mt-5">
-          Don&apos;t have an account?{' '}
+          {t('auth.noAccount', "Don't have an account?")}{' '}
           <Link to="/signup" className="text-primary-600 font-semibold hover:underline">
-            Create one
+            {t('auth.createOne', 'Create one')}
           </Link>
         </p>
       </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import MapView from '../components/MapView'
 import FacilityFilters from '../components/FacilityFilters'
 import VerificationBadge from '../components/VerificationBadge'
@@ -14,6 +15,7 @@ const DEFAULT_FILTERS = {
 }
 
 export default function HealthcareMap() {
+  const { t } = useTranslation()
   const [facilities, setFacilities] = useState([])
   const [loading, setLoading] = useState(true)
   const [userLocation, setUserLocation] = useState(null)
@@ -49,7 +51,7 @@ export default function HealthcareMap() {
         setUserLocation({ lat: latitude, lng: longitude })
         setMapCentre([latitude, longitude])
       },
-      () => alert('Could not get your location. Please allow location access.')
+      () => alert(t('map.locationError', 'Could not get your location. Please allow location access.'))
     )
   }
 
@@ -65,9 +67,9 @@ export default function HealthcareMap() {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Healthcare Map</h1>
+          <h1 className="text-2xl font-bold text-slate-900">{t('map.title', 'Healthcare Map')}</h1>
           <p className="text-slate-500 text-sm mt-1">
-            View all government healthcare facilities on the map. Click a marker for details.
+            {t('map.subtitle', 'View all government healthcare facilities on the map. Click a marker for details.')}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -79,19 +81,19 @@ export default function HealthcareMap() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            My Location
+            {t('map.myLocation', 'My Location')}
           </button>
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center gap-2 text-sm font-medium border px-4 py-2.5 rounded-xl transition-colors ${showFilters
                 ? 'bg-primary-50 text-primary-700 border-primary-300'
                 : 'text-slate-700 border-slate-200 hover:bg-slate-50'
-              }`}
+            }`}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
             </svg>
-            Filters
+            {t('facilities.filters', 'Filters')}
           </button>
         </div>
       </div>
@@ -111,11 +113,11 @@ export default function HealthcareMap() {
         {userLocation && (
           <div className="flex items-center gap-1.5 text-xs text-slate-600">
             <div className="w-3 h-3 rounded-full border-2 border-white ring-2 ring-primary-500 bg-primary-500"></div>
-            Your Location
+            {t('map.yourLocation', 'Your Location')}
           </div>
         )}
         <div className="ml-auto text-xs text-slate-400">
-          {loading ? 'Loading...' : `${facilities.length} facilit${facilities.length !== 1 ? 'ies' : 'y'} shown`}
+          {loading ? t('facilities.loading', 'Loading...') : t('map.facilitiesCount_other', '{{count}} facilities shown', { count: facilities.length })}
         </div>
       </div>
 
@@ -135,7 +137,7 @@ export default function HealthcareMap() {
             <div className="h-[520px] bg-slate-100 rounded-xl flex items-center justify-center">
               <div className="text-center">
                 <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-3"></div>
-                <p className="text-slate-400 text-sm">Loading map...</p>
+                <p className="text-slate-400 text-sm">{t('map.loadingMap', 'Loading map...')}</p>
               </div>
             </div>
           ) : (
@@ -159,7 +161,7 @@ export default function HealthcareMap() {
                       {selectedFacility.type}
                     </span>
                     <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${selectedFacility.workingStatus === 'Open' ? 'bg-success-100 text-success-700' : 'bg-slate-100 text-slate-500'}`}>
-                      {selectedFacility.workingStatus === 'Open' ? '● Open Now' : '● Closed'}
+                      {selectedFacility.workingStatus === 'Open' ? t('facilities.openNow', '● Open') : t('facilities.closed', '● Closed')}
                     </span>
                     <VerificationBadge status={selectedFacility.verificationStatus} size="sm" />
                   </div>
@@ -172,13 +174,13 @@ export default function HealthcareMap() {
                       </span>
                     ))}
                     {selectedFacility.services.length > 4 && (
-                      <span className="text-xs text-slate-400 px-1">+{selectedFacility.services.length - 4} more</span>
+                      <span className="text-xs text-slate-400 px-1">{t('facilities.moreServices', '+{{count}} more', { count: selectedFacility.services.length - 4 })}</span>
                     )}
                   </div>
                   <div className="flex items-center gap-4 text-xs text-slate-500">
-                    <span className="font-medium text-primary-600">{selectedFacility.distance} km away</span>
-                    <span>{selectedFacility.doctors.length} doctor{selectedFacility.doctors.length !== 1 ? 's' : ''}</span>
-                    {selectedFacility.bedCount > 0 && <span>{selectedFacility.bedCount} beds</span>}
+                    <span className="font-medium text-primary-600">{selectedFacility.distance} km {t('facilities.away', 'away')}</span>
+                    <span>{selectedFacility.doctors.length} {t('map.doctorsCount_one', 'doctor', { count: selectedFacility.doctors.length })}</span>
+                    {selectedFacility.bedCount > 0 && <span>{t('map.bedsCount', '{{count}} beds', { count: selectedFacility.bedCount })}</span>}
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 flex-shrink-0">
@@ -186,21 +188,21 @@ export default function HealthcareMap() {
                     to={`/facilities/${selectedFacility.id}`}
                     className="bg-primary-600 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-center"
                   >
-                    View Details
+                    {t('facilities.viewDetails', 'View Details')}
                   </Link>
                   {selectedFacility.phone && (
                     <a
                       href={`tel:${selectedFacility.phone}`}
                       className="border border-slate-200 text-slate-700 text-xs font-medium px-4 py-2 rounded-lg hover:border-primary-300 hover:text-primary-600 transition-colors text-center"
                     >
-                      📞 Call
+                      📞 {t('facilities.call', 'Call')}
                     </a>
                   )}
                   <button
                     onClick={() => setSelectedFacility(null)}
                     className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
                   >
-                    ✕ Close
+                    {t('map.close', '✕ Close')}
                   </button>
                 </div>
               </div>
@@ -212,18 +214,18 @@ export default function HealthcareMap() {
       {facilities.length > 0 && (
         <div className="mt-8">
           <h2 className="font-semibold text-slate-800 mb-4">
-            Facilities on Map
+            {t('map.facilitiesOnMap', 'Facilities on Map')}
             <span className="ml-2 text-sm font-normal text-slate-400">({facilities.length})</span>
           </h2>
           <div className="overflow-x-auto">
             <table className="w-full bg-white rounded-xl border border-slate-200 shadow-card text-sm">
               <thead>
                 <tr className="border-b border-slate-100">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Name</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Type</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Distance</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase hidden sm:table-cell">Status</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase hidden md:table-cell">Verification</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">{t('map.tableName', 'Name')}</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">{t('map.tableType', 'Type')}</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase">{t('map.tableDistance', 'Distance')}</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase hidden sm:table-cell">{t('map.tableStatus', 'Status')}</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase hidden md:table-cell">{t('map.tableVerification', 'Verification')}</th>
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
@@ -251,7 +253,7 @@ export default function HealthcareMap() {
                         className="text-xs font-medium text-primary-600 hover:text-primary-700"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        Details →
+                        {t('map.tableDetails', 'Details →')}
                       </Link>
                     </td>
                   </tr>

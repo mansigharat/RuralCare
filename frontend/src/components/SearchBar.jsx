@@ -50,7 +50,7 @@ export default function SearchBar({ onSearch, placeholder, className = '', initi
         type="submit"
         className="bg-primary-600 text-white px-5 py-3 rounded-xl text-sm font-medium hover:bg-primary-700 transition-colors shadow-sm flex-shrink-0"
       >
-        Search
+        {t('search.button', 'Search')}
       </button>
     </form>
   )

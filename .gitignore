@@ -1,3 +1,7 @@
-venv/
+
 node_modules/
+venv/
 .env
+__pycache__/
+*.pyc
+.vite/

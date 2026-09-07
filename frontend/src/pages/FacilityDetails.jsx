@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { getFacilityById } from '../services/api'
 import VerificationBadge from '../components/VerificationBadge'
 import MapView from '../components/MapView'
 
 export default function FacilityDetails() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const [facility, setFacility] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -17,7 +19,7 @@ export default function FacilityDetails() {
         const data = await getFacilityById(id)
         setFacility(data)
       } catch {
-        setError('Facility not found.')
+        setError(t('details.notFound', 'Facility not found.'))
       } finally {
         setLoading(false)
       }
@@ -39,9 +41,9 @@ export default function FacilityDetails() {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 text-center">
         <div className="text-5xl mb-4">🏥</div>
-        <h2 className="text-xl font-semibold text-slate-800 mb-2">Facility not found</h2>
+        <h2 className="text-xl font-semibold text-slate-800 mb-2">{t('details.notFound', 'Facility not found')}</h2>
         <p className="text-slate-500 mb-6">{error}</p>
-        <Link to="/facilities" className="text-primary-600 font-medium hover:underline">← Back to Search</Link>
+        <Link to="/facilities" className="text-primary-600 font-medium hover:underline">← {t('actions.back', 'Back')} {t('search.button', 'Search')}</Link>
       </div>
     )
   }
@@ -55,7 +57,7 @@ export default function FacilityDetails() {
   const isOpen = workingStatus === 'Open'
   const formattedDate = lastVerified
     ? new Date(lastVerified).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
-    : 'Unknown'
+    : t('details.unknown', 'Unknown')
 
   const typeColors = {
     PHC: 'bg-blue-100 text-blue-700',
@@ -78,7 +80,7 @@ export default function FacilityDetails() {
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
-        Back to Search
+        {t('actions.back', 'Back')} {t('search.button', 'Search')}
       </Link>
 
       {/* Header Card */}
@@ -88,7 +90,7 @@ export default function FacilityDetails() {
             {type}
           </span>
           <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${isOpen ? 'bg-success-100 text-success-700' : 'bg-slate-100 text-slate-500'}`}>
-            {isOpen ? '● Open Now' : '● Closed'}
+            {isOpen ? t('facilities.openNow', '● Open') : t('facilities.closed', '● Closed')}
           </span>
           <VerificationBadge status={verificationStatus} size="sm" />
         </div>
@@ -105,21 +107,21 @@ export default function FacilityDetails() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
           <div className="bg-slate-50 rounded-lg p-3 text-center">
             <p className="text-lg font-bold text-primary-600">{distance} km</p>
-            <p className="text-xs text-slate-500">Distance</p>
+            <p className="text-xs text-slate-500">{t('details.distance', 'Distance')}</p>
           </div>
           {bedCount > 0 && (
             <div className="bg-slate-50 rounded-lg p-3 text-center">
               <p className="text-lg font-bold text-slate-800">{bedCount}</p>
-              <p className="text-xs text-slate-500">Beds</p>
+              <p className="text-xs text-slate-500">{t('details.beds', 'Beds')}</p>
             </div>
           )}
           <div className="bg-slate-50 rounded-lg p-3 text-center">
             <p className="text-lg font-bold text-slate-800">{services.length}</p>
-            <p className="text-xs text-slate-500">Services</p>
+            <p className="text-xs text-slate-500">{t('details.servicesCount', 'Services')}</p>
           </div>
           <div className="bg-slate-50 rounded-lg p-3 text-center">
             <p className="text-lg font-bold text-slate-800">{doctors.length}</p>
-            <p className="text-xs text-slate-500">Doctors</p>
+            <p className="text-xs text-slate-500">{t('details.doctorsCount', 'Doctors')}</p>
           </div>
         </div>
 
@@ -133,7 +135,7 @@ export default function FacilityDetails() {
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
             </svg>
-            Get Directions
+            {t('details.getDirections', 'Get Directions')}
           </a>
           {phone && (
             <a
@@ -143,7 +145,7 @@ export default function FacilityDetails() {
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
-              Call {phone}
+              {t('facilities.call', 'Call')} {phone}
             </a>
           )}
           <Link
@@ -153,52 +155,52 @@ export default function FacilityDetails() {
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.072 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
-            Report Incorrect Info
+            {t('details.reportIncorrect', 'Report Incorrect Info')}
           </Link>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
         {/* Contact & Hours */}
-        <Section title="📞 Contact & Hours">
+        <Section title="📞 {t('details.contactHours', 'Contact & Hours')}">
           <div className="space-y-3 text-sm">
             <div>
-              <p className="text-xs text-slate-400 font-medium mb-0.5">Phone</p>
-              <a href={`tel:${phone}`} className="text-slate-800 font-medium hover:text-primary-600">{phone || 'Not available'}</a>
+              <p className="text-xs text-slate-400 font-medium mb-0.5">{t('details.phone', 'Phone')}</p>
+              <a href={`tel:${phone}`} className="text-slate-800 font-medium hover:text-primary-600">{phone || t('details.notAvailable', 'Not available')}</a>
             </div>
             {email && (
               <div>
-                <p className="text-xs text-slate-400 font-medium mb-0.5">Email</p>
+                <p className="text-xs text-slate-400 font-medium mb-0.5">{t('details.email', 'Email')}</p>
                 <a href={`mailto:${email}`} className="text-slate-800 hover:text-primary-600">{email}</a>
               </div>
             )}
             <div>
-              <p className="text-xs text-slate-400 font-medium mb-0.5">Working Hours</p>
+              <p className="text-xs text-slate-400 font-medium mb-0.5">{t('details.workingHours', 'Working Hours')}</p>
               <p className="text-slate-800">{workingHours}</p>
             </div>
           </div>
         </Section>
 
         {/* Verification */}
-        <Section title="✓ Verification Status">
+        <Section title="✓ {t('details.verificationTitle', 'Verification Status')}">
           <div className="space-y-3 text-sm">
             <div>
-              <p className="text-xs text-slate-400 font-medium mb-1">Status</p>
+              <p className="text-xs text-slate-400 font-medium mb-1">{t('details.status', 'Status')}</p>
               <VerificationBadge status={verificationStatus} size="md" />
             </div>
             <div>
-              <p className="text-xs text-slate-400 font-medium mb-0.5">Last Verified</p>
+              <p className="text-xs text-slate-400 font-medium mb-0.5">{t('details.lastVerified', 'Last Verified')}</p>
               <p className="text-slate-800 font-medium">{formattedDate}</p>
             </div>
             <p className="text-xs text-slate-500 bg-slate-50 p-2.5 rounded-lg">
-              Information is verified by authorised healthcare workers. Citizens can report inaccuracies.
+              {t('details.verificationInfo', 'Information is verified by authorised healthcare workers. Citizens can report inaccuracies.')}
             </p>
           </div>
         </Section>
       </div>
 
       {/* Services */}
-      <Section title="🏥 Available Services">
+      <Section title="🏥 {t('details.availableServices', 'Available Services')}">
         <div className="flex flex-wrap gap-2">
           {services.map((s) => (
             <span key={s} className="text-sm bg-primary-50 text-primary-700 border border-primary-200 px-3 py-1 rounded-full">
@@ -210,7 +212,7 @@ export default function FacilityDetails() {
 
       {/* Doctors */}
       <div className="mt-5">
-        <Section title="👨‍⚕️ Doctors & Staff">
+        <Section title="👨‍⚕️ {t('details.doctorsStaff', 'Doctors & Staff')}">
           <div className="space-y-3">
             {doctors.map((doc, i) => (
               <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
@@ -219,7 +221,7 @@ export default function FacilityDetails() {
                   <p className="text-xs text-slate-500">{doc.specialisation}</p>
                 </div>
                 <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${doc.available ? 'bg-success-100 text-success-700' : 'bg-slate-100 text-slate-400'}`}>
-                  {doc.available ? 'Available' : 'Not Today'}
+                  {doc.available ? t('details.available', 'Available') : t('details.notToday', 'Not Today')}
                 </span>
               </div>
             ))}
@@ -229,13 +231,13 @@ export default function FacilityDetails() {
 
       {/* Medicines */}
       <div className="mt-5">
-        <Section title="💊 Medicine Availability">
+        <Section title="💊 {t('details.medicineAvailability', 'Medicine Availability')}">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {medicines.map((med, i) => (
               <div key={i} className="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg">
                 <span className="text-sm text-slate-700">{med.name}</span>
                 <span className={`text-xs font-medium ${med.available ? 'text-success-700' : 'text-slate-400'}`}>
-                  {med.available ? '✓ In Stock' : '✗ Not Available'}
+                  {med.available ? t('details.inStock', '✓ In Stock') : t('details.notInStock', '✗ Not Available')}
                 </span>
               </div>
             ))}
@@ -245,7 +247,7 @@ export default function FacilityDetails() {
 
       {/* Basic Facilities */}
       <div className="mt-5">
-        <Section title="🏗️ Basic Infrastructure">
+        <Section title="🏗️ {t('details.basicInfrastructure', 'Basic Infrastructure')}">
           <div className="flex flex-wrap gap-2">
             {basicFacilities.map((f) => (
               <span key={f} className="text-sm text-slate-700 bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1.5">
@@ -262,7 +264,7 @@ export default function FacilityDetails() {
       {/* Map */}
       <div className="mt-5">
         <div className="bg-white rounded-xl border border-slate-200 shadow-card p-5">
-          <h2 className="font-semibold text-slate-800 mb-4 pb-3 border-b border-slate-100">🗺️ Location</h2>
+          <h2 className="font-semibold text-slate-800 mb-4 pb-3 border-b border-slate-100">🗺️ {t('details.location', 'Location')}</h2>
           <MapView
             facilities={[facility]}
             centre={[latitude, longitude]}
@@ -276,7 +278,7 @@ export default function FacilityDetails() {
               rel="noopener noreferrer"
               className="text-sm text-primary-600 font-medium hover:text-primary-700 flex items-center gap-1"
             >
-              Open in Google Maps →
+              {t('details.openInGoogleMaps', 'Open in Google Maps →')}
             </a>
           </div>
         </div>
