@@ -27,6 +27,7 @@ export default function Navbar() {
   const { t, i18n } = useTranslation()
   const [menuOpen, setMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [langMenuOpen, setLangMenuOpen] = useState(false)
   const { user, logOut, isAuthenticated } = useAuth()
   const navigate = useNavigate()
 
@@ -79,26 +80,46 @@ export default function Navbar() {
 
           <div className="hidden md:flex items-center gap-3">
             {/* Language Switcher */}
-            <div
-              className="flex items-center text-xs font-medium border border-slate-200 rounded-lg p-0.5 bg-slate-50"
-              role="group"
-              aria-label={t('navbar.language', 'Language')}
-            >
-              {LANGUAGES.map((lang) => (
-                <button
-                  key={lang.code}
-                  type="button"
-                  onClick={() => handleLanguageChange(lang.code)}
-                  className={`px-2 py-1 rounded transition-colors ${
-                    currentLang === lang.code
-                      ? 'bg-white text-primary-700 font-semibold shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                  aria-pressed={currentLang === lang.code}
-                >
-                  {lang.label}
-                </button>
-              ))}
+            <div className="relative">
+              <button
+                onClick={() => setLangMenuOpen((v) => !v)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors text-sm font-medium text-slate-700"
+                aria-label={t('navbar.language', 'Language')}
+                aria-expanded={langMenuOpen}
+              >
+                <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                </svg>
+                {LANGUAGES.find(l => l.code === currentLang)?.label || 'Lang'}
+                <svg className={`w-3.5 h-3.5 text-slate-400 transition-transform ${langMenuOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {langMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setLangMenuOpen(false)} />
+                  <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-xl border border-slate-200 shadow-lg z-20 py-1 overflow-hidden">
+                    {LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.code}
+                        type="button"
+                        onClick={() => {
+                          handleLanguageChange(lang.code)
+                          setLangMenuOpen(false)
+                        }}
+                        className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                          currentLang === lang.code
+                            ? 'bg-primary-50 text-primary-700 font-semibold'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                        }`}
+                      >
+                        {lang.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
 
             {isAuthenticated ? (
