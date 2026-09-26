@@ -1,8 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import { useTranslation } from 'react-i18next'
 import VerificationBadge from './VerificationBadge'
+import MapControls from './MapControls'
+import { getMapConfig } from '../services/api'
 
 
 delete L.Icon.Default.prototype._getIconUrl
@@ -94,23 +96,66 @@ export default function MapView({
   onFacilitySelect = null,
 }) {
   const { t } = useTranslation()
+  const [mapConfig, setMapConfig] = useState(null)
+  const [mapType, setMapType] = useState('default')
+  const [overlays, setOverlays] = useState({ transit: false, traffic: false })
+
+  useEffect(() => {
+    async function loadConfig() {
+      const config = await getMapConfig()
+      setMapConfig(config)
+    }
+    loadConfig()
+  }, [])
+
   const statusColors = {
     Open: { bg: '#dcfce7', color: '#15803d' },
     Closed: { bg: '#f1f5f9', color: '#64748b' },
   }
 
+  const baseLayer = mapConfig?.providers[mapType] || {
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; OpenStreetMap'
+  }
+
   return (
-    <div style={{ height }} className="rounded-xl overflow-hidden border border-slate-200 shadow-card">
+    <div style={{ height }} className="rounded-xl overflow-hidden border border-slate-200 shadow-card relative">
+      <MapControls 
+        mapType={mapType} 
+        setMapType={setMapType}
+        overlays={overlays}
+        setOverlays={setOverlays}
+      />
+      
       <MapContainer
         center={centre}
         zoom={zoom}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: '100%', width: '100%', zIndex: 0 }}
         scrollWheelZoom={true}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          key={`base-${mapType}`}
+          attribution={baseLayer.attribution}
+          url={baseLayer.url}
         />
+        
+        {overlays.traffic && mapConfig?.providers?.traffic && (
+          <TileLayer
+            key="traffic"
+            url={mapConfig.providers.traffic.url}
+            opacity={0.8}
+            zIndex={2}
+          />
+        )}
+        
+        {overlays.transit && mapConfig?.providers?.transit && (
+          <TileLayer
+            key="transit"
+            url={mapConfig.providers.transit.url}
+            opacity={0.8}
+            zIndex={3}
+          />
+        )}
 
         <MapUpdater centre={centre} zoom={zoom} />
 

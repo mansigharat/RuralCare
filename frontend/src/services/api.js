@@ -329,6 +329,29 @@ export async function sendAssistantMessage(message) {
   }
 }
 
+// ─── Map Configuration ─────────────────────────────────────────────
+
+export async function getMapConfig() {
+  try {
+    const data = await apiFetch('/map-config')
+    return data
+  } catch (err) {
+    console.warn('[RuralCare] map-config failed, using fallback:', err.message)
+    return {
+      providers: {
+        default: {
+          url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          attribution: '&copy; OpenStreetMap contributors'
+        },
+        satellite: {
+          url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+          attribution: "&copy; Esri"
+        }
+      }
+    }
+  }
+}
+
 // ─── Auth ────────────────────────────────────────────────────────
 
 /**

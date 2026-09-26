@@ -22,4 +22,5 @@ class User(Base):
     email = Column(String, nullable=True)
     hashed_password = Column(String, nullable=False)
     role = Column(Enum(UserRole), nullable=False, default=UserRole.citizen)
+    map_preference = Column(String, nullable=True, default="default")
     created_at = Column(DateTime(timezone=True), server_default=func.now())

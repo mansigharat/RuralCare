@@ -14,7 +14,7 @@ from database.connection import Base, engine
 # Import all models so Alembic / create_all can see them
 from models import user, facility, service, doctor, medicine, report  # noqa: F401
 
-from routes import auth, facilities, doctors, medicines, reports, admin, ai
+from routes import auth, facilities, doctors, medicines, reports, admin, ai, map
 
 # ── App init ──────────────────────────────────────────────────────────────────
 
@@ -53,6 +53,7 @@ app.include_router(medicines.router)
 app.include_router(reports.router)
 app.include_router(admin.router)
 app.include_router(ai.router)
+app.include_router(map.router)
 
 
 # ── Health check ──────────────────────────────────────────────────────────────
