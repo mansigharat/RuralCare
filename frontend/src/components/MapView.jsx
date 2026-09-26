@@ -95,18 +95,20 @@ export default function MapView({
   height = '500px',
   onFacilitySelect = null,
 }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const currentLang = i18n.language ? i18n.language.split('-')[0] : 'en'
+
   const [mapConfig, setMapConfig] = useState(null)
   const [mapType, setMapType] = useState('default')
   const [overlays, setOverlays] = useState({ transit: false, traffic: false })
 
   useEffect(() => {
     async function loadConfig() {
-      const config = await getMapConfig()
+      const config = await getMapConfig(currentLang)
       setMapConfig(config)
     }
     loadConfig()
-  }, [])
+  }, [currentLang])
 
   const statusColors = {
     Open: { bg: '#dcfce7', color: '#15803d' },
@@ -130,6 +132,9 @@ export default function MapView({
       <MapContainer
         center={centre}
         zoom={zoom}
+        minZoom={3}
+        maxBounds={[[-90, -180], [90, 180]]}
+        maxBoundsViscosity={1.0}
         style={{ height: '100%', width: '100%', zIndex: 0 }}
         scrollWheelZoom={true}
       >

@@ -16,20 +16,23 @@ class MapPreferences(BaseModel):
     transit_enabled: bool = False
 
 @router.get("")
-def get_map_config():
+def get_map_config(lang: str = "en"):
     """Returns safe tile URLs to the frontend."""
     # We load these from the environment so keys aren't hardcoded in React
     mapbox_token = os.getenv("MAPBOX_ACCESS_TOKEN", "your-mapbox-token-here")
     
+    # We use Google Maps raster tiles here because they support dynamic 
+    # language switching via the 'hl' parameter (e.g. hl=hi, hl=mr, hl=en)
+    # which is required to display place names in the selected language.
     return {
         "providers": {
             "default": {
-                "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                "attribution": '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                "url": f"https://mt1.google.com/vt/lyrs=m&x={{x}}&y={{y}}&z={{z}}&hl={lang}",
+                "attribution": '&copy; Google Maps'
             },
             "satellite": {
-                "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-                "attribution": "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+                "url": f"https://mt1.google.com/vt/lyrs=y&x={{x}}&y={{y}}&z={{z}}&hl={lang}",
+                "attribution": "&copy; Google Maps"
             },
             "traffic": {
                 "url": f"https://api.mapbox.com/styles/v1/mapbox/traffic-day-v2/tiles/256/{{z}}/{{x}}/{{y}}@2x?access_token={mapbox_token}",

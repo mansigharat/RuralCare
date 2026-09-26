@@ -331,9 +331,9 @@ export async function sendAssistantMessage(message) {
 
 // ─── Map Configuration ─────────────────────────────────────────────
 
-export async function getMapConfig() {
+export async function getMapConfig(lang = 'en') {
   try {
-    const data = await apiFetch('/map-config')
+    const data = await apiFetch(`/api/map-config?lang=${lang}`)
     return data
   } catch (err) {
     console.warn('[RuralCare] map-config failed, using fallback:', err.message)
